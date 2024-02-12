@@ -5,7 +5,6 @@ import pygame
 import PyQt6.QtCore as qtc
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
-# from mutagen.mp3 import MP3
 from tinytag import TinyTag as tag
 from UI.player_ui_ui import Ui_mw_main
 
@@ -24,18 +23,17 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
-        for x in os.listdir(s_path):
-            print(x)
+        for file in os.listdir(s_path):
+            fpath = os.path.join(s_path, file)
+            self.set_song(fpath)
 
-        
-
-    
     def add_song(self):
         s_path = qtw.QFileDialog.getOpenFileName()
-        file = s_path[0]  # .split('/')[-1]
+        file:str = s_path[0]  # .split('/')[-1]
+        self.set_song(file)
         # print(file)
         # print(tag.is_supported(file))
-        info = tag.get(file)
+        
         # print(f'album: {info.album}')
         # print(f'album artist: {info.albumartist}')
         # print(f'artist: {info.artist}')
@@ -44,18 +42,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         # print(f'comment: {info.comment}')
         # print(f'duration: {info.duration}')
         # print(f'genre: {info.genre}')
-        song = '{} - {} ({})    {}'.format(
-            info.artist,
-            info.title,
-            info.album,
-            self.song_time(info.duration)
-        )
-        self.scrollAreaWidget.layout().addWidget(qtw.QLabel(song))
 
-        
-        # self.scrollArea.setVerticalScrollBarPolicy()
-        # self.lb_song.setText(song)
-        # print(song)
     
     def song_time(self, inf):
         hours = int(inf // 3600)
@@ -72,6 +59,24 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             seconds if seconds > 10 else '0' + str(seconds)
             )
         return time_took
+    
+    def set_song(self, file_link):
+        info = tag.get(file_link)
+        song = '{} - {} ({})    {}'.format(
+            info.artist,
+            info.title,
+            info.album,
+            self.song_time(info.duration)
+        )
+        label = qtw.QCommandLinkButton(song)
+        label.setCheckable(True)
+        self.scrollAreaWidget.layout().addWidget(label)
+
+
+    def remove_empties(self):
+        emps = [self.empty1, self.empty2]
+        for x in emps:
+            self.scrollAreaWidget.layout().removeWidget(x)
 
 
 
