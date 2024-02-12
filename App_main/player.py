@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pygame
@@ -18,12 +19,21 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.pb_add_file.clicked.connect(self.song_info)
+        self.pb_add_file.clicked.connect(self.add_song)
+        self.pb_add_folder.clicked.connect(self.add_songs)
     
-    def song_info(self):
+    def add_songs(self):
+        s_path = qtw.QFileDialog.getExistingDirectory()
+        for x in os.listdir(s_path):
+            print(x)
+
+        
+
+    
+    def add_song(self):
         s_path = qtw.QFileDialog.getOpenFileName()
         file = s_path[0]  # .split('/')[-1]
-        print(file)
+        # print(file)
         # print(tag.is_supported(file))
         info = tag.get(file)
         # print(f'album: {info.album}')
@@ -38,16 +48,30 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             info.artist,
             info.title,
             info.album,
-            info.duration
+            self.song_time(info.duration)
         )
-        print(song)
+        self.scrollAreaWidget.layout().addWidget(qtw.QLabel(song))
 
-        print(info.bitrate)
         
+        # self.scrollArea.setVerticalScrollBarPolicy()
+        # self.lb_song.setText(song)
+        # print(song)
+    
+    def song_time(self, inf):
+        hours = int(inf // 3600)
+        hour_other = inf % 3600
 
-        # audio = MP3(file)
-        # print(audio.info.pprint(), '\n\n')
-        # print(mutagen.File(file))
+        mins = int(hour_other // 60)
+        mins_other = hour_other % 60
+
+        seconds = int(mins_other % 60)
+
+        time_took = '{}:{}:{}'.format(
+            hours if hours > 10 else '0' + str(hours),
+            mins if mins > 10 else '0' + str(mins),
+            seconds if seconds > 10 else '0' + str(seconds)
+            )
+        return time_took
 
 
 

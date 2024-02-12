@@ -316,7 +316,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QScrollArea" name="sa_songs_scroll">
+      <widget class="QScrollArea" name="scrollArea">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -325,31 +325,43 @@
          <height>191</height>
         </rect>
        </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
-       <widget class="QWidget" name="sa_songs_scroll_content">
+       <widget class="QWidget" name="scrollAreaWidget">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>579</width>
+          <width>562</width>
           <height>189</height>
          </rect>
         </property>
-        <widget class="QLabel" name="lb_song">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>561</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Artist-Song Title.mp3</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLabel" name="empty1">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="empty2">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>
