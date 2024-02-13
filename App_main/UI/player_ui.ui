@@ -316,7 +316,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QScrollArea" name="scrollArea">
+      <widget class="QListWidget" name="lw_songs">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -325,35 +325,6 @@
          <height>191</height>
         </rect>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOn</enum>
-       </property>
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidget">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>562</width>
-          <height>189</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout"/>
-       </widget>
       </widget>
      </widget>
     </widget>

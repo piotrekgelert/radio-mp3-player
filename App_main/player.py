@@ -10,16 +10,22 @@ from UI.player_ui_ui import Ui_mw_main
 
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
-    song_path = ''
-    folder_path = ''
+    # song_path = []
+    # folder_path = []
+    # song_file_name = ''
 
     songs = {}
+    # songs_files = {}
     
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
+        self.pb_remove_all.clicked.connect(self.clear_song_list)
+        self.lw_songs.itemClicked.connect(self.song_chosen)
+        self.pb_start.clicked.connect(self.play)
+        self.pb_stop.clicked.connect(self.stop)
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -29,7 +35,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
 
     def add_song(self):
         s_path = qtw.QFileDialog.getOpenFileName()
-        file:str = s_path[0]  # .split('/')[-1]
+        file:str = s_path[0]
         self.set_song(file)
         # print(file)
         # print(tag.is_supported(file))
@@ -60,23 +66,45 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             )
         return time_took
     
-    def set_song(self, file_link):
+    def set_song(self, file_link:str):
+        self.song_dict(file_link)
         info = tag.get(file_link)
-        song = '{} - {} ({})    {}'.format(
+        song = '{} - {} ({}):    {}'.format(
             info.artist,
             info.title,
             info.album,
             self.song_time(info.duration)
         )
-        label = qtw.QCommandLinkButton(song)
-        label.setCheckable(True)
-        self.scrollAreaWidget.layout().addWidget(label)
+        label = qtw.QListWidgetItem(song)
+        self.lw_songs.addItem(label)
+        
+    def song_chosen(self, item:qtw.QListWidgetItem):
+        song = item.text().split(':')[0]
+        self.lb_le_now_play.setText(song)
+    
+    def song_dict(self, file_link:str):
+        if len(self.songs):
+            song_idx = [x for x in self.songs.keys()][-1]
+            self.songs[song_idx+1] = file_link
+        else:
+            self.songs[0] = file_link
 
-
-    def remove_empties(self):
-        emps = [self.empty1, self.empty2]
-        for x in emps:
-            self.scrollAreaWidget.layout().removeWidget(x)
+    def clear_song_list(self):
+        self.songs.clear()
+        self.lb_le_now_play.clear()
+        self.lw_songs.clear()
+    
+    def play(self):
+        pygame.init()
+        pygame.mixer.init()
+        # clock = pygame.time.Clock()
+        pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
+        pygame.mixer.music.play()
+        # while pygame.mixer.music.get_busy():
+        #     clock.tick(100)
+    
+    def stop(self):
+        pygame.mixer.music.stop()
 
 
 
