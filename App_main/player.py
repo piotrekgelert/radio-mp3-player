@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import pygame
 import PyQt6.QtCore as qtc
@@ -10,23 +11,24 @@ from UI.player_ui_ui import Ui_mw_main
 
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
-    songs = {}
-    songs_duration = 0
+    songs: dict = {}
+    songs_duration: int = 0
+    is_playing: bool = False
+    is_paused: bool = False
     
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.pygame_init()
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
         self.pb_remove_all.clicked.connect(self.clear_song_list)
         self.lw_songs.itemClicked.connect(self.song_chosen)
         self.pb_start.clicked.connect(self.play)
         self.pb_pause.clicked.connect(self.pause)
+        
         self.pb_stop.clicked.connect(self.stop)
         self.dl_song_volume.valueChanged.connect(self.volume_set)
-        pygame.init()
-        pygame.mixer.init()
-        pygame.mixer.music.set_volume(0.0)
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -96,21 +98,48 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lb_le_now_play.clear()
         self.lw_songs.clear()
     
+    def pygame_init(self):
+        pygame.init()
+        pygame.mixer.init()
+        pygame.mixer.music.set_volume(0.0)
+    
     def play(self):
-        # pygame.init()
-        # pygame.mixer.init()
-
-        pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
-        pygame.mixer.music.play()
-        self.lb_le_status.setText('Playing')
+        if len(self.songs) > 0:
+            if self.lw_songs.currentRow() >= 0:
+                pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
+                pygame.mixer.music.play()
+                self.lb_le_status.setText('Playing')
+                self.lb_mp_message.clear()
+                if not self.is_playing:
+                    self.is_playing = True
+            else:
+                self.lb_mp_message.setText('select song to play')
+                self.lb_mp_message.setStyleSheet(
+                    'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+                    )
+        else:
+            self.lb_mp_message.setText('there is no song to play')
+            self.lb_mp_message.setStyleSheet(
+                    'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+                    )
     
     def stop(self):
         pygame.mixer.music.stop()
         self.lb_le_status.setText('Stopped')
+        if self.is_playing:
+            self.is_playing = False
     
     def pause(self):
-        self.lb_le_status.setText('Paused')
-        pygame.mixer.music.pause()
+        if self.is_playing and not self.is_paused:
+            pygame.mixer.music.pause()
+            self.lb_le_status.setText('Paused')
+            self.is_playing = False
+            self.is_paused = True
+        elif self.is_paused and not self.is_playing:
+            pygame.mixer.music.unpause()
+            self.lb_le_status.setText('Playing')
+            self.is_playing = True
+            self.is_paused = False
     
     def volume_set(self):
         volume = self.dl_song_volume.value()
@@ -121,9 +150,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         }
         self.lcd_song_volume.display(vol[volume][0])
         pygame.mixer.music.set_volume(vol[volume][1])
-    
-    def counter_set(self):
-        ...
     
 
 
