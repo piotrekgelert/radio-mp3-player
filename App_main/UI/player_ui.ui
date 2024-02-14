@@ -158,7 +158,7 @@
         <x>179</x>
         <y>99</y>
         <width>601</width>
-        <height>191</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -211,7 +211,7 @@
         <rect>
          <x>10</x>
          <y>90</y>
-         <width>521</width>
+         <width>501</width>
          <height>31</height>
         </rect>
        </property>
@@ -222,43 +222,14 @@
       <widget class="QLabel" name="lb_song_time">
        <property name="geometry">
         <rect>
-         <x>540</x>
+         <x>520</x>
          <y>90</y>
-         <width>51</width>
+         <width>71</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>00:00</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="lb_song_search">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>501</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="accessibleDescription">
-        <string/>
-       </property>
-       <property name="text">
-        <string>Search for song</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pb_player_search">
-       <property name="geometry">
-        <rect>
-         <x>520</x>
-         <y>140</y>
-         <width>81</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Search</string>
+        <string>00:00:00</string>
        </property>
       </widget>
       <widget class="QDial" name="dl_song_volume">
@@ -305,9 +276,9 @@
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>300</y>
+        <y>240</y>
         <width>601</width>
-        <height>211</height>
+        <height>271</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -322,7 +293,7 @@
          <x>10</x>
          <y>10</y>
          <width>581</width>
-         <height>191</height>
+         <height>251</height>
         </rect>
        </property>
       </widget>

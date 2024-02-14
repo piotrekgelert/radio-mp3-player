@@ -10,12 +10,8 @@ from UI.player_ui_ui import Ui_mw_main
 
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
-    # song_path = []
-    # folder_path = []
-    # song_file_name = ''
-
     songs = {}
-    # songs_files = {}
+    songs_duration = 0
     
     def __init__(self):
         super().__init__()
@@ -25,7 +21,12 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_remove_all.clicked.connect(self.clear_song_list)
         self.lw_songs.itemClicked.connect(self.song_chosen)
         self.pb_start.clicked.connect(self.play)
+        self.pb_pause.clicked.connect(self.pause)
         self.pb_stop.clicked.connect(self.stop)
+        self.dl_song_volume.valueChanged.connect(self.volume_set)
+        pygame.init()
+        pygame.mixer.init()
+        pygame.mixer.music.set_volume(0.0)
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -69,6 +70,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def set_song(self, file_link:str):
         self.song_dict(file_link)
         info = tag.get(file_link)
+        self.songs_duration = info.duration
         song = '{} - {} ({}):    {}'.format(
             info.artist,
             info.title,
@@ -95,18 +97,34 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lw_songs.clear()
     
     def play(self):
-        pygame.init()
-        pygame.mixer.init()
-        # clock = pygame.time.Clock()
+        # pygame.init()
+        # pygame.mixer.init()
+
         pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
         pygame.mixer.music.play()
-        # while pygame.mixer.music.get_busy():
-        #     clock.tick(100)
+        self.lb_le_status.setText('Playing')
     
     def stop(self):
         pygame.mixer.music.stop()
-
-
+        self.lb_le_status.setText('Stopped')
+    
+    def pause(self):
+        self.lb_le_status.setText('Paused')
+        pygame.mixer.music.pause()
+    
+    def volume_set(self):
+        volume = self.dl_song_volume.value()
+        vol = {
+            0: (0, 0.0), 1: (1, 0.2), 2: (2, 0.4), 3: (3, 0.6), 4: (4, 0.8),
+            5: (5, 1), 6: (6, 1.2), 7: (7, 1.4), 8: (8, 1.6), 9: (9, 1.8),
+            10: (10, 2)
+        }
+        self.lcd_song_volume.display(vol[volume][0])
+        pygame.mixer.music.set_volume(vol[volume][1])
+    
+    def counter_set(self):
+        ...
+    
 
 
 if __name__ == '__main__':
