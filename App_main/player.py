@@ -29,6 +29,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         self.pb_stop.clicked.connect(self.stop)
         self.dl_song_volume.valueChanged.connect(self.volume_set)
+        self.pb_previous.clicked.connect(self.prev_song)
+        self.pb_next.clicked.connect(self.next_song)
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -73,12 +75,20 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.song_dict(file_link)
         info = tag.get(file_link)
         self.songs_duration = info.duration
-        song = '{} - {} ({}):    {}'.format(
-            info.artist,
-            info.title,
-            info.album,
-            self.song_time(info.duration)
-        )
+        if all(
+            True if x is not None else False for x in\
+                [info.artist, info.title, info.album]
+            ):
+            song = '{} - {} ({}):    {}'.format(
+                info.artist,
+                info.title,
+                info.album,
+                self.song_time(info.duration)
+            )
+        else:
+            song = '{}:     {}'.format(
+                file_link.split('\\')[-1], self.song_time(info.duration))
+        
         label = qtw.QListWidgetItem(song)
         self.lw_songs.addItem(label)
         
@@ -113,15 +123,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 if not self.is_playing:
                     self.is_playing = True
             else:
-                self.lb_mp_message.setText('select song to play')
-                self.lb_mp_message.setStyleSheet(
-                    'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
-                    )
+                Messages.non_selected(self)
         else:
-            self.lb_mp_message.setText('there is no song to play')
-            self.lb_mp_message.setStyleSheet(
-                    'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
-                    )
+            Messages.no_song(self)
     
     def stop(self):
         pygame.mixer.music.stop()
@@ -141,6 +145,23 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.is_playing = True
             self.is_paused = False
     
+    def prev_song(self):
+        current = self.lw_songs.currentRow()
+        if current < 1:
+            Messages.no_song(self)
+        else:
+            self.lw_songs.setCurrentRow(current - 1)
+            self.song_chosen(self.lw_songs.currentItem())
+    
+    def next_song(self):
+        current = self.lw_songs.currentRow()
+        try:
+            self.lw_songs.setCurrentRow(current + 1)
+            self.song_chosen(self.lw_songs.currentItem())
+        except:
+            Messages.no_song(self)
+
+    
     def volume_set(self):
         volume = self.dl_song_volume.value()
         vol = {
@@ -150,7 +171,23 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         }
         self.lcd_song_volume.display(vol[volume][0])
         pygame.mixer.music.set_volume(vol[volume][1])
+
+
+
+class Messages(MainClass):
+
+    def non_selected(self):
+        self.lb_mp_message.setText('select song to play')
+        self.lb_mp_message.setStyleSheet(
+            'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+            )
     
+    def no_song(self):
+        self.lb_mp_message.setText('there is no song to play')
+        self.lb_mp_message.setStyleSheet(
+                'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+                )
+
 
 
 if __name__ == '__main__':
