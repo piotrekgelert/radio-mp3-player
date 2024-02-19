@@ -4,3 +4,5 @@ tinytag-1.10.1 [https://github.com/devsnd/tinytag]
 pygame 2.5.2
 miniaudio 1.59 [https://github.com/irmen/pyminiaudio]
 python-ffmpeg 2.0.10 [https://github.com/jonghwanhyeon/python-ffmpeg]
+for AAC streaming download FFMPEG [https://ffmpeg.org/download.html],
+next add to the PATH on windows eg: `C:\ffmpeg\bin`, restart computer and done

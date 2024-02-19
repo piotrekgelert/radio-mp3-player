@@ -1,4 +1,5 @@
 import os
+import pathlib
 import sys
 import time
 
@@ -19,6 +20,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.radio_buttons()
         self.pygame_init()
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
@@ -161,7 +163,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         except:
             Messages.no_song(self)
 
-    
     def volume_set(self):
         volume = self.dl_song_volume.value()
         vol = {
@@ -172,7 +173,37 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lcd_song_volume.display(vol[volume][0])
         pygame.mixer.music.set_volume(vol[volume][1])
 
-
+    def set_radio_button(self):
+        root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
+        main_path = os.path.join(root_folder, 'App_images')
+        def func(button: qtw.QPushButton, img_name: str, radio_name: str, radio_info: str):
+            button.setIcon(qtg.QIcon(f'{main_path}\\{img_name}'))
+            button.setText(f'{radio_name}\n{radio_info}')
+            button.setStyleSheet('QPushButton { text-align: left}')
+        return func
+    
+    def radio_buttons(self):
+        buttons = self.set_radio_button()
+        buttons(self.pb_radiostation_1, 'rte_radio_1.png', 'RTE Radio 1', 'Folk, News, Pop')
+        buttons(self.pb_radiostation_2, 'newstalk.png', 'Newstalk', 'Sport, News, Talk')
+        buttons(self.pb_radiostation_3, 'rte_2fm.png', 'RTÉ 2fm', 'Alternative, Pop, Top 40')
+        buttons(self.pb_radiostation_4, 'today_fm.png', 'Today FM', 'Adult contemporary')
+        buttons(self.pb_radiostation_5, 'spin_1038.png', 'Spin 1038', 'Pop, Top 40')
+        buttons(self.pb_radiostation_6, 'irelands_classic_hits.png', 'Ireland\'s Classic Hits', 'Classic hits')
+        buttons(self.pb_radiostation_7, 'dublins_q102.png', 'Dublin\'s Q102', 'Adult contemporary')
+        buttons(self.pb_radiostation_8, 'rte_lyric_fm.png', 'RTÉ Lyric FM', 'Classical Music')
+        buttons(self.pb_radiostation_9, 'radio_kerry.png', 'Radio Kerry', 'Local Service, Adult contemporary')
+        buttons(self.pb_radiostation_10, 'rte_gold.png', 'RTÉ Gold', 'Classic hits, 50s, 60s')
+        buttons(self.pb_radiostation_11, '98fm.png', '98FM', 'Pop, Adult contemporary')
+        buttons(self.pb_radiostation_12, 'cork_s_96fm.png', 'Cork\'s 96FM', 'Local Service, Adult contemporary')
+        buttons(self.pb_radiostation_13, 'fm104_live.png', 'FM104', 'Top40, Pop')
+        buttons(self.pb_radiostation_14, 'radio_nova.png', 'Radio Nova', 'Adult contemporary, Adult hits, Rock n Roll')
+        buttons(self.pb_radiostation_15, 'midwest_radio.png', 'Midwest Radio', 'Local Service')
+        buttons(self.pb_radiostation_16, 'corks_redfm.png', 'Cork\'s RedFM', 'Pop, Top 40')
+        buttons(self.pb_radiostation_17, 'ocean_fm.png', 'Ocean FM', 'Local Service')
+        buttons(self.pb_radiostation_18, 'galway_bay_fm.png', 'Galway Bay FM', 'Local Service')
+        buttons(self.pb_radiostation_19, 'spin_south_west.png', 'SPIN South West', 'Top 40, Community')
+        buttons(self.pb_radiostation_20, 'live_95.png', 'Limerick’s Live 95FM', 'Adult contemporary, Local Service')
 
 class Messages(MainClass):
 
