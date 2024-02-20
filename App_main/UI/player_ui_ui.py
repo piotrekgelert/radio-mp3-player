@@ -156,7 +156,7 @@ class Ui_mw_main(object):
         self.sa_radios_scroll.setWidgetResizable(True)
         self.sa_radios_scroll.setObjectName("sa_radios_scroll")
         self.sa_radios_scroll_content = QtWidgets.QWidget()
-        self.sa_radios_scroll_content.setGeometry(QtCore.QRect(0, 0, 742, 792))
+        self.sa_radios_scroll_content.setGeometry(QtCore.QRect(0, -224, 742, 792))
         self.sa_radios_scroll_content.setObjectName("sa_radios_scroll_content")
         self.gridLayout = QtWidgets.QGridLayout(self.sa_radios_scroll_content)
         self.gridLayout.setObjectName("gridLayout")
