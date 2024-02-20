@@ -1,3 +1,4 @@
+import json
 import os
 import pathlib
 import sys
@@ -16,11 +17,13 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     songs_duration: int = 0
     is_playing: bool = False
     is_paused: bool = False
+    radio_checked: bool = False
     
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.radio_buttons()
+        self.button_clicked()
         self.pygame_init()
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
@@ -33,6 +36,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.dl_song_volume.valueChanged.connect(self.volume_set)
         self.pb_previous.clicked.connect(self.prev_song)
         self.pb_next.clicked.connect(self.next_song)
+
+        # self.pb_start_radio.clicked.connect(self.test)
+
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -180,30 +186,51 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             button.setIcon(qtg.QIcon(f'{main_path}\\{img_name}'))
             button.setText(f'{radio_name}\n{radio_info}')
             button.setStyleSheet('QPushButton { text-align: left}')
+            button.setCheckable(True)
         return func
     
     def radio_buttons(self):
+        info = self.get_button_data()
         buttons = self.set_radio_button()
-        buttons(self.pb_radiostation_1, 'rte_radio_1.png', 'RTE Radio 1', 'Folk, News, Pop')
-        buttons(self.pb_radiostation_2, 'newstalk.png', 'Newstalk', 'Sport, News, Talk')
-        buttons(self.pb_radiostation_3, 'rte_2fm.png', 'RTÉ 2fm', 'Alternative, Pop, Top 40')
-        buttons(self.pb_radiostation_4, 'today_fm.png', 'Today FM', 'Adult contemporary')
-        buttons(self.pb_radiostation_5, 'spin_1038.png', 'Spin 1038', 'Pop, Top 40')
-        buttons(self.pb_radiostation_6, 'irelands_classic_hits.png', 'Ireland\'s Classic Hits', 'Classic hits')
-        buttons(self.pb_radiostation_7, 'dublins_q102.png', 'Dublin\'s Q102', 'Adult contemporary')
-        buttons(self.pb_radiostation_8, 'rte_lyric_fm.png', 'RTÉ Lyric FM', 'Classical Music')
-        buttons(self.pb_radiostation_9, 'radio_kerry.png', 'Radio Kerry', 'Local Service, Adult contemporary')
-        buttons(self.pb_radiostation_10, 'rte_gold.png', 'RTÉ Gold', 'Classic hits, 50s, 60s')
-        buttons(self.pb_radiostation_11, '98fm.png', '98FM', 'Pop, Adult contemporary')
-        buttons(self.pb_radiostation_12, 'cork_s_96fm.png', 'Cork\'s 96FM', 'Local Service, Adult contemporary')
-        buttons(self.pb_radiostation_13, 'fm104_live.png', 'FM104', 'Top40, Pop')
-        buttons(self.pb_radiostation_14, 'radio_nova.png', 'Radio Nova', 'Adult contemporary, Adult hits, Rock n Roll')
-        buttons(self.pb_radiostation_15, 'midwest_radio.png', 'Midwest Radio', 'Local Service')
-        buttons(self.pb_radiostation_16, 'corks_redfm.png', 'Cork\'s RedFM', 'Pop, Top 40')
-        buttons(self.pb_radiostation_17, 'ocean_fm.png', 'Ocean FM', 'Local Service')
-        buttons(self.pb_radiostation_18, 'galway_bay_fm.png', 'Galway Bay FM', 'Local Service')
-        buttons(self.pb_radiostation_19, 'spin_south_west.png', 'SPIN South West', 'Top 40, Community')
-        buttons(self.pb_radiostation_20, 'live_95.png', 'Limerick’s Live 95FM', 'Adult contemporary, Local Service')
+        for x in range(1, 21):
+            buttons(getattr(self, self.sa_radios_scroll_content.children()[x].objectName()),
+                info[f'butt_{x}']['icon'], 
+                info[f'butt_{x}']['name'], 
+                info[f'butt_{x}']['desc']
+            )
+        # buttons(self.pb_radiostation_1, 'rte_radio_1.png', 'RTE Radio 1', 'Folk, News, Pop')
+        # buttons(self.pb_radiostation_2, 'newstalk.png', 'Newstalk', 'Sport, News, Talk')
+        # buttons(self.pb_radiostation_3, 'rte_2fm.png', 'RTÉ 2fm', 'Alternative, Pop, Top 40')
+        # buttons(self.pb_radiostation_4, 'today_fm.png', 'Today FM', 'Adult contemporary')
+        # buttons(self.pb_radiostation_5, 'spin_1038.png', 'Spin 1038', 'Pop, Top 40')
+        # buttons(self.pb_radiostation_6, 'irelands_classic_hits.png', 'Ireland\'s Classic Hits', 'Classic hits')
+        # buttons(self.pb_radiostation_7, 'dublins_q102.png', 'Dublin\'s Q102', 'Adult contemporary')
+        # buttons(self.pb_radiostation_8, 'rte_lyric_fm.png', 'RTÉ Lyric FM', 'Classical Music')
+        # buttons(self.pb_radiostation_9, 'radio_kerry.png', 'Radio Kerry', 'Local Service, Adult contemporary')
+        # buttons(self.pb_radiostation_10, 'rte_gold.png', 'RTÉ Gold', 'Classic hits, 50s, 60s')
+        # buttons(self.pb_radiostation_11, '98fm.png', '98FM', 'Pop, Adult contemporary')
+        # buttons(self.pb_radiostation_12, 'cork_s_96fm.png', 'Cork\'s 96FM', 'Local Service, Adult contemporary')
+        # buttons(self.pb_radiostation_13, 'fm104_live.png', 'FM104', 'Top40, Pop')
+        # buttons(self.pb_radiostation_14, 'radio_nova.png', 'Radio Nova', 'Adult contemporary, Adult hits, Rock n Roll')
+        # buttons(self.pb_radiostation_15, 'midwest_radio.png', 'Midwest Radio', 'Local Service')
+        # buttons(self.pb_radiostation_16, 'corks_redfm.png', 'Cork\'s RedFM', 'Pop, Top 40')
+        # buttons(self.pb_radiostation_17, 'ocean_fm.png', 'Ocean FM', 'Local Service')
+        # buttons(self.pb_radiostation_18, 'galway_bay_fm.png', 'Galway Bay FM', 'Local Service')
+        # buttons(self.pb_radiostation_19, 'spin_south_west.png', 'SPIN South West', 'Top 40, Community')
+        # buttons(self.pb_radiostation_20, 'live_95.png', 'Limerick’s Live 95FM', 'Adult contemporary, Local Service')
+
+    def get_button_data(self):
+        f_path = r'D:\Python_PORTFOLIO312\16_mp3_player_radio\App_main\irish_top_20_buttons.json'
+        with open(f_path, 'r') as f:
+            btn = json.load(f)
+            return btn
+        # print(self.sa_radios_scroll_content.children()[1].objectName())
+    
+    def button_clicked(self):
+        self.pb_radiostation_1.clicked.emit()
+        self.sa_radios_scroll_content.children()
+        # buttons = [self.sa_radios_scroll_content.children()[x].objectName() for x in range(1, 21) if self.sa_radios_scroll_content.children()[x].clicked()]
+        # return buttons
 
 class Messages(MainClass):
 
