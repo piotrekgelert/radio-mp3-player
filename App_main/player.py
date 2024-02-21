@@ -4,6 +4,7 @@ import pathlib
 import sys
 import time
 
+import miniaudio
 import pygame
 import PyQt6.QtCore as qtc
 import PyQt6.QtGui as qtg
@@ -18,6 +19,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     is_playing: bool = False
     is_paused: bool = False
     radio_checked: bool = False
+    playing_num: str = ''
+    audio_device: miniaudio.PlaybackDevice  = miniaudio.PlaybackDevice()
     
     def __init__(self):
         super().__init__()
@@ -37,7 +40,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_next.clicked.connect(self.next_song)
         
         self.button_clicked_connnect()
-        self.pb_start_radio.clicked.connect(self.test)
+        self.pb_start_radio.clicked.connect(self.test_1)
+        self.pb_stop_radio.clicked.connect(self.test_2)
 
     
     def add_songs(self):
@@ -192,7 +196,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         return func
     
     def radio_buttons(self):
-        info = self.get_button_data()
+        info = self.get_button_data('irish_top_20_buttons.json')
         buttons = self.set_radio_button()
         for x in range(1, 21):
             butt = self.sa_radios_scroll_content.children()[x].objectName()
@@ -203,27 +207,28 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 info[f'butt_{num}']['desc']
             )
 
-    def get_button_data(self):
+    def get_button_data(self, j_file):
         main_path = self.root_path('App_main')
-        f_path = os.path.join(main_path, 'irish_top_20_buttons.json')
+        f_path = os.path.join(main_path, j_file)
         with open(f_path, 'r') as f:
             btn = json.load(f)
             return btn
     
     def button_clicked(self, nb: int):
         main_path = self.root_path('App_images')
-        info: json = self.get_button_data()
+        info: json = self.get_button_data('irish_top_20_buttons.json')
         butt: str = self.sa_radios_scroll_content.children()[nb].objectName()
         _, _, num = butt.split('_')
+        self.playing_num = num
         self.lb_le_now_listen.setText(info[f'butt_{num}']['name'])
         self.lb_radio_icon_big.setPixmap(
             qtg.QPixmap(os.path.join(main_path, info[f'butt_{num}']['icon']))
             )
-        print(nb, num, '\n',
-              info[f'butt_{num}']['name'],'\n',
-              info[f'butt_{num}']['desc'],'\n',
-              os.path.join(main_path, info[f'butt_{num}']['icon']), '\n',
-              main_path)
+        # print(nb, num, '\n',
+        #       info[f'butt_{num}']['name'],'\n',
+        #       info[f'butt_{num}']['desc'],'\n',
+        #       os.path.join(main_path, info[f'butt_{num}']['icon']), '\n',
+        #       main_path)
     
     def connect_buttons(self):
         def func(pbr: qtw.QPushButton, nb:int):
@@ -236,11 +241,31 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         for x, y in zip(range(1, 21), nums):
             buttons_clicked(getattr(self, 'pb_radiostation_{}'.format(x)), y)
             
-    def test(self):
-        nd = {}
-        for nb in range(1, 21):
-            nd[nb] = self.sa_radios_scroll_content.children()[nb].objectName()
-        print(nd)
+    def test_1(self):
+        self.audio_device.stop()
+        self.lb_radio_message.setText('Working')
+        info: json = self.get_button_data('radio_web_format.json')
+        
+        if info[f'butt_{self.playing_num}']['format'] == 'mp3':
+            with miniaudio.IceCastClient(
+                info[f'butt_{self.playing_num}']['web']) as src:
+                stream = miniaudio.stream_any(src, src.audio_format)
+                self.audio_device.start(stream)
+                self.lb_radio_message.setText('Working')
+                input()
+                # with miniaudio.PlaybackDevice() as device:
+                #     if on_off == 'on':
+                #         device.start(stream)
+                #         self.lb_radio_message.setText('Working')
+                #         input('')
+                #     if on_off == 'off':
+                #         device.close()
+                #         self.lb_radio_message.setText('Stopped')
+                #         input('')
+    def test_2(self):
+        self.audio_device.stop()
+        self.lb_radio_message.setText('Stopped')
+        # input()
 
 class Messages(MainClass):
 
