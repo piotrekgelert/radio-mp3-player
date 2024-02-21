@@ -36,26 +36,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_previous.clicked.connect(self.prev_song)
         self.pb_next.clicked.connect(self.next_song)
         
-        self.pb_radiostation_1.clicked.connect(lambda: [self.button_clicked(1)])
-        self.pb_radiostation_2.clicked.connect(lambda: [self.button_clicked(10)])
-        self.pb_radiostation_3.clicked.connect(lambda: [self.button_clicked(12)])
-        self.pb_radiostation_4.clicked.connect(lambda: [self.button_clicked(3)])
-        self.pb_radiostation_5.clicked.connect(lambda: [self.button_clicked(11)])
-        self.pb_radiostation_6.clicked.connect(lambda: [self.button_clicked(19)])
-        self.pb_radiostation_7.clicked.connect(lambda: [self.button_clicked(20)])
-        self.pb_radiostation_8.clicked.connect(lambda: [self.button_clicked(16)])
-        self.pb_radiostation_9.clicked.connect(lambda: [self.button_clicked(18)])
-        self.pb_radiostation_10.clicked.connect(lambda: [self.button_clicked(2)])
-        self.pb_radiostation_11.clicked.connect(lambda: [self.button_clicked(14)])
-        self.pb_radiostation_12.clicked.connect(lambda: [self.button_clicked(8)])
-        self.pb_radiostation_13.clicked.connect(lambda: [self.button_clicked(7)])
-        self.pb_radiostation_14.clicked.connect(lambda: [self.button_clicked(6)])
-        self.pb_radiostation_15.clicked.connect(lambda: [self.button_clicked(5)])
-        self.pb_radiostation_16.clicked.connect(lambda: [self.button_clicked(9)])
-        self.pb_radiostation_17.clicked.connect(lambda: [self.button_clicked(17)])
-        self.pb_radiostation_18.clicked.connect(lambda: [self.button_clicked(4)])
-        self.pb_radiostation_19.clicked.connect(lambda: [self.button_clicked(13)])
-        self.pb_radiostation_20.clicked.connect(lambda: [self.button_clicked(15)])
+        self.button_clicked_connnect()
         self.pb_start_radio.clicked.connect(self.test)
 
     
@@ -198,9 +179,12 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lcd_song_volume.display(vol[volume][0])
         pygame.mixer.music.set_volume(vol[volume][1])
 
+    def root_path(self, destination_folder: str) -> str:
+        root_path = r''.format(pathlib.Path(__file__).parent.absolute().parent)
+        return os.path.join(root_path, destination_folder)
+
     def set_radio_button(self):
-        root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
-        main_path = os.path.join(root_folder, 'App_images')
+        main_path = self.root_path('App_images')
         def func(button: qtw.QPushButton, img_name: str, radio_name: str, radio_info: str):
             button.setIcon(qtg.QIcon(f'{main_path}\\{img_name}'))
             button.setText(f'{radio_name}\n{radio_info}')
@@ -220,22 +204,38 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             )
 
     def get_button_data(self):
-        f_path = r'D:\Python_PORTFOLIO312\16_mp3_player_radio\App_main\irish_top_20_buttons.json'
+        main_path = self.root_path('App_main')
+        f_path = os.path.join(main_path, 'irish_top_20_buttons.json')
         with open(f_path, 'r') as f:
             btn = json.load(f)
             return btn
-        # print(self.sa_radios_scroll_content.children()[1].objectName())
     
     def button_clicked(self, nb: int):
+        main_path = self.root_path('App_images')
         info: json = self.get_button_data()
         butt: str = self.sa_radios_scroll_content.children()[nb].objectName()
         _, _, num = butt.split('_')
+        self.lb_le_now_listen.setText(info[f'butt_{num}']['name'])
+        self.lb_radio_icon_big.setPixmap(
+            qtg.QPixmap(os.path.join(main_path, info[f'butt_{num}']['icon']))
+            )
         print(nb, num, '\n',
               info[f'butt_{num}']['name'],'\n',
-              info[f'butt_{num}']['desc'],'\n')
-        # buttons = [self.sa_radios_scroll_content.children()[x].objectName() for x in range(1, 21) if self.sa_radios_scroll_content.children()[x].clicked()]
-        # return buttons
+              info[f'butt_{num}']['desc'],'\n',
+              os.path.join(main_path, info[f'butt_{num}']['icon']), '\n',
+              main_path)
     
+    def connect_buttons(self):
+        def func(pbr: qtw.QPushButton, nb:int):
+            pbr.clicked.connect(lambda: [self.button_clicked(nb)])
+        return func
+
+    def button_clicked_connnect(self):
+        nums:list[int] = [1, 10, 12, 3, 11, 19, 20, 16, 18, 2, 14, 8, 7, 6, 5, 9, 17, 4, 13, 15]
+        buttons_clicked = self.connect_buttons()
+        for x, y in zip(range(1, 21), nums):
+            buttons_clicked(getattr(self, 'pb_radiostation_{}'.format(x)), y)
+            
     def test(self):
         nd = {}
         for nb in range(1, 21):
