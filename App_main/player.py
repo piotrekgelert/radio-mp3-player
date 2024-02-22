@@ -1,6 +1,7 @@
 import json
 import os
 import pathlib
+import subprocess
 import sys
 import time
 
@@ -20,7 +21,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     is_paused: bool = False
     radio_checked: bool = False
     playing_num: str = ''
-    audio_device: miniaudio.PlaybackDevice  = miniaudio.PlaybackDevice()
+    on_off: bool = False
+    audio_device: miniaudio.PlaybackDevice  = miniaudio.PlaybackDevice(
+        output_format=miniaudio.SampleFormat.SIGNED16,
+        nchannels=2, sample_rate=44100)
+    radio_process = None
     
     def __init__(self):
         super().__init__()
@@ -40,8 +45,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_next.clicked.connect(self.next_song)
         
         self.button_clicked_connnect()
-        self.pb_start_radio.clicked.connect(self.test_1)
-        self.pb_stop_radio.clicked.connect(self.test_2)
+        self.pb_start_radio.clicked.connect(self.start_listening)
+        self.pb_stop_radio.clicked.connect(self.stop_listening)
 
     
     def add_songs(self):
@@ -240,32 +245,75 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         buttons_clicked = self.connect_buttons()
         for x, y in zip(range(1, 21), nums):
             buttons_clicked(getattr(self, 'pb_radiostation_{}'.format(x)), y)
-            
-    def test_1(self):
-        self.audio_device.stop()
-        self.lb_radio_message.setText('Working')
+
+    def stream_signal(self, source):
+        channels = 2
+        sample_width = 2  # 16 bit pcm
+        required_frames = yield b""  # generator initialization
+        while True:
+            required_bytes = required_frames * channels * sample_width
+            sample_data = source.read(required_bytes)
+            if not sample_data:
+                break
+            # print(".", end="", flush=True)
+            required_frames = yield sample_data
+    
+    def start_listening(self):
         info: json = self.get_button_data('radio_web_format.json')
-        
-        if info[f'butt_{self.playing_num}']['format'] == 'mp3':
-            with miniaudio.IceCastClient(
-                info[f'butt_{self.playing_num}']['web']) as src:
-                stream = miniaudio.stream_any(src, src.audio_format)
-                self.audio_device.start(stream)
-                self.lb_radio_message.setText('Working')
-                input()
-                # with miniaudio.PlaybackDevice() as device:
-                #     if on_off == 'on':
-                #         device.start(stream)
-                #         self.lb_radio_message.setText('Working')
-                #         input('')
-                #     if on_off == 'off':
-                #         device.close()
-                #         self.lb_radio_message.setText('Stopped')
-                #         input('')
-    def test_2(self):
-        self.audio_device.stop()
-        self.lb_radio_message.setText('Stopped')
-        # input()
+        filename = info[f'butt_{self.playing_num}']['web']
+        channels = 2
+        sample_rate = 44100
+        # miniaudio.PlaybackDevice(output_format=miniaudio.SampleFormat.SIGNED16,
+        #                       nchannels=2, sample_rate=44100)
+        with self.audio_device as dev:
+            self.radio_process = subprocess.Popen(["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
+                                        "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
+                                        "-ac", str(channels), "-ar", str(sample_rate), "-"],
+                                    stdin=None, stdout=subprocess.PIPE)
+            stream = self.stream_signal(self.radio_process.stdout)
+            next(stream)  # start the generator
+            dev.start(stream)
+            self.get_execute_input()
+            # input("Audio file playing in the background. Enter to stop playback: ")
+            # self.radio_process.terminate()
+
+    def stop_listening(self):
+        if self.is_listening():
+            self.radio_process.terminate()
+            self.audio_device.stop()
+            time.sleep(0.5)
+            if self.is_listening():
+                self.radio_process.kill()
+                self.audio_device.close()
+                
+            self.radio_process = None
+    
+    def is_listening(self):
+        # poll() returns None if not exited yet
+        return self.radio_process is not None and self.radio_process.poll() is None
+    
+    def prompt(self):
+        try:
+            input()
+        except RuntimeError:
+            return None
+    
+    def force_prompt(self):
+        close = None
+        while close is None:
+            close = self.prompt()
+        return close
+    
+    def get_execute_input(self):
+        close = self.force_prompt()
+        try:
+            self.execute(close)
+        except CommandError as e:
+            print(e)
+    
+    def execute(self, command):
+        command = input()
+
 
 class Messages(MainClass):
 
@@ -282,6 +330,8 @@ class Messages(MainClass):
                 )
 
 
+class CommandError(Exception):
+    pass
 
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
