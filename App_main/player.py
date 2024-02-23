@@ -1,3 +1,4 @@
+import gc
 import json
 import os
 import pathlib
@@ -6,6 +7,7 @@ import sys
 import time
 
 import miniaudio
+import psutil
 import pygame
 import PyQt6.QtCore as qtc
 import PyQt6.QtGui as qtg
@@ -15,6 +17,7 @@ from UI.player_ui_ui import Ui_mw_main
 
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
+    proc = psutil.Process(os.getpid())
     songs: dict = {}
     songs_duration: int = 0
     is_playing: bool = False
@@ -260,31 +263,33 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     
     def start_listening(self):
         info: json = self.get_button_data('radio_web_format.json')
-        filename = info[f'butt_{self.playing_num}']['web']
-        channels = 2
-        sample_rate = 44100
+        filename: str = info[f'butt_{self.playing_num}']['web']
+        channels: int = 2
+        sample_rate: int = 44100
         # miniaudio.PlaybackDevice(output_format=miniaudio.SampleFormat.SIGNED16,
         #                       nchannels=2, sample_rate=44100)
+        print(self.is_listening())
+
         with self.audio_device as dev:
             self.radio_process = subprocess.Popen(["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
                                         "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
                                         "-ac", str(channels), "-ar", str(sample_rate), "-"],
                                     stdin=None, stdout=subprocess.PIPE)
             stream = self.stream_signal(self.radio_process.stdout)
-            next(stream)  # start the generator
+            next(stream)  # start the stream, stream.send()
             dev.start(stream)
             self.get_execute_input()
-            # input("Audio file playing in the background. Enter to stop playback: ")
-            # self.radio_process.terminate()
-
+  
     def stop_listening(self):
         if self.is_listening():
             self.radio_process.terminate()
-            self.audio_device.stop()
+            # self.audio_device.stop()
             time.sleep(0.5)
             if self.is_listening():
                 self.radio_process.kill()
-                self.audio_device.close()
+                gc.collect()  # garbage collector
+                self.proc.memory_info().rss  # free up memory
+                # self.audio_device.close()
                 
             self.radio_process = None
     
@@ -295,7 +300,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def prompt(self):
         try:
             input()
-        except RuntimeError:
+        except RuntimeError():
+            return None
+        finally:
             return None
     
     def force_prompt(self):
