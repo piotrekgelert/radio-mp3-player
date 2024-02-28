@@ -1,7 +1,9 @@
 import gc
 import json
+import logging
 import os
 import pathlib
+import signal
 import subprocess
 import sys
 import time
@@ -17,7 +19,8 @@ from UI.player_ui_ui import Ui_mw_main
 
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
-    proc = psutil.Process(os.getpid())
+    proc_nb = None
+    # process = None
     songs: dict = {}
     songs_duration: int = 0
     is_playing: bool = False
@@ -25,9 +28,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     radio_checked: bool = False
     playing_num: str = ''
     on_off: bool = False
-    audio_device: miniaudio.PlaybackDevice  = miniaudio.PlaybackDevice(
-        output_format=miniaudio.SampleFormat.SIGNED16,
-        nchannels=2, sample_rate=44100)
     radio_process = None
     
     def __init__(self):
@@ -49,8 +49,17 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         self.button_clicked_connnect()
         self.pb_start_radio.clicked.connect(self.start_listening)
-        self.pb_stop_radio.clicked.connect(self.stop_listening)
+        self.pb_start_radio.clicked.connect(self.activate_process)
+        
+        self.pb_stop_radio.clicked.connect(self.kill_background_processes)
 
+    def logg(self, txt:str):
+        logging.basicConfig(filename='newlog.log',
+                            format='%(asctime)s %(message)s',
+                            filemode='w')
+        logger = logging.getLogger()
+        logger.setLevel(logger.DEBUG)
+        return logger
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -138,10 +147,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             if self.lw_songs.currentRow() >= 0:
                 pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
                 pygame.mixer.music.play()
-                self.lb_le_status.setText('Playing')
                 self.lb_mp_message.clear()
+                
                 if not self.is_playing:
                     self.is_playing = True
+                    self.lb_le_status.setText('Playing')
             else:
                 Messages.non_selected(self)
         else:
@@ -161,9 +171,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.is_paused = True
         elif self.is_paused and not self.is_playing:
             pygame.mixer.music.unpause()
-            self.lb_le_status.setText('Playing')
-            self.is_playing = True
-            self.is_paused = False
+        self.lb_le_status.setText('Playing')
+        self.is_playing = True
+        self.is_paused = False
     
     def prev_song(self):
         current = self.lw_songs.currentRow()
@@ -190,6 +200,13 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         }
         self.lcd_song_volume.display(vol[volume][0])
         pygame.mixer.music.set_volume(vol[volume][1])
+        if self.is_playing and not self.is_paused:
+            pygame.mixer.music.pause()
+            self.lb_le_status.setText('Paused')
+            self.is_playing = False
+            self.is_paused = True
+        elif self.is_paused and not self.is_playing:
+            pygame.mixer.music.unpause()      
 
     def root_path(self, destination_folder: str) -> str:
         root_path = r''.format(pathlib.Path(__file__).parent.absolute().parent)
@@ -261,42 +278,161 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             # print(".", end="", flush=True)
             required_frames = yield sample_data
     
+    def audio_device(self):
+        return miniaudio.PlaybackDevice(
+            output_format=miniaudio.SampleFormat.SIGNED16,
+            nchannels=2, 
+            sample_rate=44100)
+    
+    def process_device(self, filename, channels, sample_rate):
+        return subprocess.Popen(
+            ["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
+            "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
+            "-ac", str(channels), "-ar", str(sample_rate), "-"],
+            stdin=None, stdout=subprocess.PIPE
+        )
+    
+    def activate_process(self):
+        if not self.radio_process:
+            self.logg('process not initialized')
+            return False
+        
+        try:
+            proc = psutil.Process(self.radio_process.pid)
+            self.proc_nb = proc
+            # proc_name = psutil.Process(self.radio_process.args)
+            if proc.status() == psutil.STATUS_ZOMBIE:
+
+                self.logg('process is zombie')
+                return False
+            if proc.status() in [psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING]:
+                print('process activated')
+                # self.logg('process activated')
+                return True
+            # return False
+        except (psutil.NoSuchProcess, Exception) as e:
+            self.logg('process not found while checking: {}'.format(e))
+            return False
+    
+    def radiostation_next(self):
+
+        if self.is_listening():
+            info: json = self.get_button_data('radio_web_format.json')
+            channels: int = 2
+            sample_rate: int = 44100
+            while 1:
+                time.sleep(10)
+                filename: str = info[f'butt_{self.playing_num}']['web']
+                with self.audio_device() as dev:
+                    self.radio_process = self.process_device(
+                        filename, channels, sample_rate
+                        )
+                    self.activate_process()
+                    stream = self.stream_signal(self.radio_process.stdout)
+                    next(stream)  # start the stream, stream.send()
+                    dev.start(stream)
+
+    
+    
     def start_listening(self):
         info: json = self.get_button_data('radio_web_format.json')
         filename: str = info[f'butt_{self.playing_num}']['web']
         channels: int = 2
         sample_rate: int = 44100
-        # miniaudio.PlaybackDevice(output_format=miniaudio.SampleFormat.SIGNED16,
-        #                       nchannels=2, sample_rate=44100)
-        print(self.is_listening())
+            
+        # print(self.is_listening())
+        # try:
+        #     self.radio_process = self.process_device(
+        #         filename, channels, sample_rate
+        #     )
+        #     self.activate_process()
+        # except Exception as e:
+        #     logging.log(msg='Error while starting: {}'.format(e))
 
-        with self.audio_device as dev:
-            self.radio_process = subprocess.Popen(["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
-                                        "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
-                                        "-ac", str(channels), "-ar", str(sample_rate), "-"],
-                                    stdin=None, stdout=subprocess.PIPE)
+
+        with self.audio_device() as dev:
+            self.radio_process = self.process_device(
+                filename, channels, sample_rate
+                )
+            self.activate_process()
             stream = self.stream_signal(self.radio_process.stdout)
             next(stream)  # start the stream, stream.send()
             dev.start(stream)
-            self.get_execute_input()
+            try:
+                input()
+                # self.get_execute_input()
+            except Exception as e:
+                print(e)
+                time.sleep(10)
+                self.terminate_app()
+                # self.get_execute_input()
+            #     self.pb_start_radio.clearFocus()
+            # finally:
+            #     self.pb_start_radio.destroy()
+                
+
   
+    def kill_background_processes(self):
+        # print(self.proc_nb)
+        if self.is_listening():
+            try:
+                self.lb_le_now_listen.clear()
+                self.lb_radio_icon_big.clear()
+                self.proc_nb.kill()
+                self.proc_nb.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.proc_nb.kill()
+            except Exception as e:
+                raise
+            finally:
+                self.proc_nb = None
+        else:
+            self.terminate_app()
+
+        # proc = psutil.Process(self.proc_nb.pid)
+        # print(proc.name(), proc.status())
+        
+        # print(self.proc_nb.name, '\n', self.proc_nb.pid, '\n', self.proc_nb.status)
+        # procc = {}
+        # all_processes = psutil.process_iter(attrs=['pid', 'name'])
+        # for pr in all_processes:
+        #     if pr.info['name'] == self.proc_nb.name and  pr.info['pid'] == self.proc_nb.pid
+        #     print()
+        #     procc[] =
+        #     pr.info['name']
+        # print()
+        # parrent_pid = os.getppid()
+        # print(parrent_pid, procc[parrent_pid])
+        # 
+        
+        # print(all_processes)
+
     def stop_listening(self):
         if self.is_listening():
+            print(self.is_listening(), 'terminate')
             self.radio_process.terminate()
+            # self.radio_process.wait(timeout=0.1)  # terminates whole app
+            
             # self.audio_device.stop()
             time.sleep(0.5)
             if self.is_listening():
+                print(self.is_listening(), 'kill')
                 self.radio_process.kill()
+                self.radio_process.returncode
                 gc.collect()  # garbage collector
                 self.proc.memory_info().rss  # free up memory
                 # self.audio_device.close()
                 
-            self.radio_process = None
+        self.radio_process = None
     
     def is_listening(self):
         # poll() returns None if not exited yet
         return self.radio_process is not None and self.radio_process.poll() is None
     
+    def terminate_app(self):
+        parrent_pid = os.getppid()
+        os.kill(parrent_pid, signal.SIGINT)
+        
     def prompt(self):
         try:
             input()
