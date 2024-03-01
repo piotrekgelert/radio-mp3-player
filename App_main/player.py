@@ -1,6 +1,6 @@
 import gc
 import json
-import logging
+import logging as log
 import os
 import pathlib
 import signal
@@ -14,10 +14,10 @@ import pygame
 import PyQt6.QtCore as qtc
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
-import vlc
 from tinytag import TinyTag as tag
 from UI.player_ui_ui import Ui_mw_main
 
+log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=log.DEBUG)
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
     proc_nb = None
@@ -30,8 +30,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     playing_num: str = ''
     on_off: bool = False
     radio_process = None
-    instance: vlc.Instance = vlc.Instance()
-    is_running: bool = False
     
     def __init__(self):
         super().__init__()
@@ -52,17 +50,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         self.button_clicked_connnect()
         self.pb_start_radio.clicked.connect(self.start_listening)
-        # self.pb_start_radio.clicked.connect(self.activate_process)
+        self.pb_start_radio.clicked.connect(self.activate_process)
         
         self.pb_stop_radio.clicked.connect(self.stop_listening)
-
-    def logg(self, txt:str):
-        logging.basicConfig(filename='newlog.log',
-                            format='%(asctime)s %(message)s',
-                            filemode='w')
-        logger = logging.getLogger()
-        logger.setLevel(logger.DEBUG)
-        return logger
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -264,118 +254,64 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         return func
 
     def button_clicked_connnect(self):
-        nums:list[int] = [
-            1, 10, 12, 3, 11, 19, 20, 16, 18, 2, 14, 8, 7, 6, 5, 9, 17, 4, 13, 15
-            ]
+        nums:list[int] = [1, 10, 12, 3, 11, 19, 20, 16, 18, 2, 14, 8, 7, 6, 5, 9, 17, 4, 13, 15]
         buttons_clicked = self.connect_buttons()
         for x, y in zip(range(1, 21), nums):
             buttons_clicked(getattr(self, 'pb_radiostation_{}'.format(x)), y)
 
-    # def start_listening(self):
-    #     self.start_radio()
+    def stream_signal(self, source):
+        channels = 2
+        sample_width = 2  # 16 bit pcm
+        required_frames = yield b""  # generator initialization
+        while True:
+            required_bytes = required_frames * channels * sample_width
+            sample_data = source.read(required_bytes)
+            if not sample_data:
+                break
+            # print(".", end="", flush=True)
+            required_frames = yield sample_data
     
-    # def stop_listening(self):
-    #     self.stop_radio()
+    def audio_device(self):
+        return miniaudio.PlaybackDevice(
+            output_format=miniaudio.SampleFormat.SIGNED16,
+            nchannels=2, 
+            sample_rate=44100)
     
-    def get_url(self):
-        info: json = self.get_button_data('radio_web_format.json')
-        web: str = info[f'butt_{self.playing_num}']['web']
-        return web
+    def process_device(self, filename, channels, sample_rate):
+        return subprocess.Popen(
+            ["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
+            "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
+            "-ac", str(channels), "-ar", str(sample_rate), "-"],
+            stdin=None, stdout=subprocess.PIPE
+        )
     
-    def radio_player(self, web):
-        pl = self.instance.media_player_new()
-        media = self.instance.media_new(web)
-        pl.set_media(media)
-        if self.is_running == True:
-            pl.play()
-        else:
-            pl.stop()
-        while self.is_running:
-            # time.sleep(1)
-            media.get_meta(12)
+    def activate_process(self):
+        if not self.radio_process:
+            log.info('process not initialized')
+            return False
         
+        try:
+            proc = psutil.Process(self.radio_process.pid)
+            self.proc_nb = proc
+            # proc_name = psutil.Process(self.radio_process.args)
+            if proc.status() == psutil.STATUS_ZOMBIE:
+
+                log.info('process is zombie')
+                return False
+            if proc.status() in [psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING]:
+                # print('process activated')
+                log.info('process activated')
+                return True
+            # return False
+        except (psutil.NoSuchProcess, Exception) as e:
+            log.error('process not found while checking: {}'.format(e))
+            return False
+    
     def start_listening(self):
-        self.is_running = True
-        url = self.get_url()
-        self.radio_player(url)
-        
-    def stop_listening(self):
-        self.is_running = False
-        url = self.get_url()
-        self.radio_player(url)
-    # def stream_signal(self, source):
-    #     channels = 2
-    #     sample_width = 2  # 16 bit pcm
-    #     required_frames = yield b""  # generator initialization
-    #     while True:
-    #         required_bytes = required_frames * channels * sample_width
-    #         sample_data = source.read(required_bytes)
-    #         if not sample_data:
-    #             break
-    #         # print(".", end="", flush=True)
-    #         required_frames = yield sample_data
-    
-    # def audio_device(self):
-    #     return miniaudio.PlaybackDevice(
-    #         output_format=miniaudio.SampleFormat.SIGNED16,
-    #         nchannels=2, 
-    #         sample_rate=44100)
-    
-    # def process_device(self, filename, channels, sample_rate):
-    #     return subprocess.Popen(
-    #         ["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
-    #         "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
-    #         "-ac", str(channels), "-ar", str(sample_rate), "-"],
-    #         stdin=None, stdout=subprocess.PIPE
-    #     )
-    
-    # def activate_process(self):
-    #     if not self.radio_process:
-    #         self.logg('process not initialized')
-    #         return False
-        
-    #     try:
-    #         proc = psutil.Process(self.radio_process.pid)
-    #         self.proc_nb = proc
-    #         # proc_name = psutil.Process(self.radio_process.args)
-    #         if proc.status() == psutil.STATUS_ZOMBIE:
-
-    #             self.logg('process is zombie')
-    #             return False
-    #         if proc.status() in [psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING]:
-    #             print('process activated')
-    #             # self.logg('process activated')
-    #             return True
-    #         # return False
-    #     except (psutil.NoSuchProcess, Exception) as e:
-    #         self.logg('process not found while checking: {}'.format(e))
-    #         return False
-    
-    # def radiostation_next(self):
-
-    #     if self.is_listening():
-    #         info: json = self.get_button_data('radio_web_format.json')
-    #         channels: int = 2
-    #         sample_rate: int = 44100
-    #         while 1:
-    #             time.sleep(10)
-    #             filename: str = info[f'butt_{self.playing_num}']['web']
-    #             with self.audio_device() as dev:
-    #                 self.radio_process = self.process_device(
-    #                     filename, channels, sample_rate
-    #                     )
-    #                 self.activate_process()
-    #                 stream = self.stream_signal(self.radio_process.stdout)
-    #                 next(stream)  # start the stream, stream.send()
-    #                 dev.start(stream)
-
-    
-    
-    # def start_listening(self):
-    #     info: json = self.get_button_data('radio_web_format.json')
-    #     filename: str = info[f'butt_{self.playing_num}']['web']
-    #     channels: int = 2
-    #     sample_rate: int = 44100
+        info: json = self.get_button_data('radio_web_format.json')
+        filename: str = info[f'butt_{self.playing_num}']['web']
+        channels: int = 2
+        sample_rate: int = 44100
             
         # print(self.is_listening())
         # try:
@@ -384,47 +320,54 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         #     )
         #     self.activate_process()
         # except Exception as e:
-        #     logging.log(msg='Error while starting: {}'.format(e))
+        #     log.error(msg='Error while starting: {}'.format(e))
 
 
-        # with self.audio_device() as dev:
-        #     self.radio_process = self.process_device(
-        #         filename, channels, sample_rate
-        #         )
-        #     self.activate_process()
-        #     stream = self.stream_signal(self.radio_process.stdout)
-        #     next(stream)  # start the stream, stream.send()
-        #     dev.start(stream)
-        #     try:
-        #         input()
-        #         # self.get_execute_input()
-        #     except Exception as e:
-        #         print(e)
-        #         time.sleep(10)
-        #         self.terminate_app()
+        with self.audio_device() as dev:
+            self.radio_process = self.process_device(
+                filename, channels, sample_rate
+                )
+            self.activate_process()
+            stream = self.stream_signal(self.radio_process.stdout)
+            next(stream)  # start the stream, stream.send()
+            dev.start(stream)
+            try:
+                input()
                 # self.get_execute_input()
+            except Exception as e:
+                log.info(e)
+                Messages.no_response(self)
+                time.sleep(10)
+                # self.get_execute_input()
+                signal.signal(signal.SIGINT, signal.SIG_IGN)
+                sys.stdout.flush()
+                # os.execv(sys.argv[0], sys.argv)
+                # self.terminate_app()
+                
+                
+                
             #     self.pb_start_radio.clearFocus()
             # finally:
             #     self.pb_start_radio.destroy()
-                
 
-  
-    # def kill_background_processes(self):
-    #     # print(self.proc_nb)
-    #     if self.is_listening():
-    #         try:
-    #             self.lb_le_now_listen.clear()
-    #             self.lb_radio_icon_big.clear()
-    #             self.proc_nb.kill()
-    #             self.proc_nb.wait(timeout=5)
-    #         except subprocess.TimeoutExpired:
-    #             self.proc_nb.kill()
-    #         except Exception as e:
-    #             raise
-    #         finally:
-    #             self.proc_nb = None
-    #     else:
-    #         self.terminate_app()
+    def stop_listening(self):
+        # print(self.proc_nb)
+        if self.is_listening():
+            try:
+                self.lb_le_now_listen.clear()
+                self.lb_radio_icon_big.clear()
+                self.proc_nb.kill()
+                self.proc_nb.wait(timeout=5)
+                sys.stdout.flush()
+            except subprocess.TimeoutExpired:
+                self.proc_nb.kill()
+                sys.stdout.flush()
+            except Exception as e:
+                raise
+            finally:
+                self.proc_nb = None
+        else:
+            self.terminate_app()
 
         # proc = psutil.Process(self.proc_nb.pid)
         # print(proc.name(), proc.status())
@@ -455,77 +398,44 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     #         if self.is_listening():
     #             print(self.is_listening(), 'kill')
     #             self.radio_process.kill()
-    #             self.radio_process.returncode
-    #             gc.collect()  # garbage collector
-    #             self.proc.memory_info().rss  # free up memory
+    #             # self.radio_process.returncode
+    #             # gc.collect()  # garbage collector
+    #             # self.proc.memory_info().rss  # free up memory
     #             # self.audio_device.close()
                 
     #     self.radio_process = None
     
-    # def is_listening(self):
-    #     # poll() returns None if not exited yet
-    #     return self.radio_process is not None and self.radio_process.poll() is None
+    def is_listening(self):
+        # poll() returns None if not exited yet
+        return self.radio_process is not None and self.radio_process.poll() is None
     
-    # def terminate_app(self):
-    #     parrent_pid = os.getppid()
-    #     os.kill(parrent_pid, signal.SIGINT)
+    def terminate_app(self):
+        parrent_pid = os.getppid()
+        os.kill(parrent_pid, signal.SIGINT)
         
-    # def prompt(self):
-    #     try:
-    #         input()
-    #     except RuntimeError():
-    #         return None
-    #     finally:
-    #         return None
+    def prompt(self):
+        try:
+            input()
+        except RuntimeError():
+            return None
+        finally:
+            return None
     
-    # def force_prompt(self):
-    #     close = None
-    #     while close is None:
-    #         close = self.prompt()
-    #     return close
+    def force_prompt(self):
+        close = None
+        while close is None:
+            close = self.prompt()
+        return close
     
-    # def get_execute_input(self):
-    #     close = self.force_prompt()
-    #     try:
-    #         self.execute(close)
-    #     except CommandError as e:
-    #         print(e)
+    def get_execute_input(self):
+        close = self.force_prompt()
+        try:
+            self.execute(close)
+        except CommandError as e:
+            print(e)
     
-    # def execute(self, command):
-    #     command = input()
-
-
-# class StreamRadio(MainClass):
-#     def __init__(self):
-#         self.instance: vlc.Instance = vlc.Instance()
-#         self.is_running: bool = False
-    
-    # def get_url(self):
-    #     info: json = self.get_button_data('radio_web_format.json')
-    #     web: str = info[f'butt_{self.playing_num}']['web']
-    #     return web
-    
-    # def radio_player(self, web):
-    #     pl = self.instance.media_player_new()
-    #     media = self.instance.media_new(web)
-    #     pl.set_media(media)
-    #     if self.is_running == True:
-    #         pl.play()
-    #     else:
-    #         pl.stop()
-    #     while self.is_running:
-    #         time.sleep(1)
-    #         media.get_meta(12)
-        
-    # def start_radio(self):
-    #     self.is_running = True
-    #     url = self.get_url()
-    #     self.radio_player(url)
-        
-    # def stop_radio(self):
-    #     self.is_running = False
-    #     url = self.get_url()
-    #     self.radio_player(url)
+    def execute(self, command):
+        command = input()
 
 
 class Messages(MainClass):
@@ -541,6 +451,12 @@ class Messages(MainClass):
         self.lb_mp_message.setStyleSheet(
                 'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
                 )
+    
+    def no_response(self):
+        self.lb_radio_message.setText('Radio is not responsive')
+        self.lb_radio_message.setStyleSheet(
+            'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+        )
 
 
 class CommandError(Exception):
