@@ -6,7 +6,9 @@ import pathlib
 import signal
 import subprocess
 import sys
+import threading
 import time
+from threading import Thread
 
 import miniaudio
 import psutil
@@ -30,6 +32,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     playing_num: str = ''
     on_off: bool = False
     radio_process = None
+    threadd: Thread = None
+    dev = None
     
     def __init__(self):
         super().__init__()
@@ -280,7 +284,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def process_device(self, filename, channels, sample_rate):
         return subprocess.Popen(
             ["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
-            "-i", filename, "-f", "s16le", "-acodec", "pcm_s16le",
+            "-i", filename, "-f",
+            "s16le", "-acodec", "pcm_s16le",
             "-ac", str(channels), "-ar", str(sample_rate), "-"],
             stdin=None, stdout=subprocess.PIPE
         )
@@ -308,134 +313,38 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             return False
     
     def start_listening(self):
+        if self.threadd is None or not self.threadd.is_alive():
+            self.threadd = Thread(target=self.listening)
+            self.threadd.start()
+    
+    
+    def listening(self):
         info: json = self.get_button_data('radio_web_format.json')
         filename: str = info[f'butt_{self.playing_num}']['web']
         channels: int = 2
         sample_rate: int = 44100
-            
-        # print(self.is_listening())
-        # try:
-        #     self.radio_process = self.process_device(
-        #         filename, channels, sample_rate
-        #     )
-        #     self.activate_process()
-        # except Exception as e:
-        #     log.error(msg='Error while starting: {}'.format(e))
 
-
-        with self.audio_device() as dev:
-            self.radio_process = self.process_device(
+        self.dev = self.audio_device()
+        self.radio_process = self.process_device(
                 filename, channels, sample_rate
                 )
-            self.activate_process()
-            stream = self.stream_signal(self.radio_process.stdout)
-            next(stream)  # start the stream, stream.send()
-            dev.start(stream)
-            try:
-                input()
-                # self.get_execute_input()
-            except Exception as e:
-                log.info(e)
-                Messages.no_response(self)
-                time.sleep(10)
-                # self.get_execute_input()
-                signal.signal(signal.SIGINT, signal.SIG_IGN)
-                sys.stdout.flush()
-                # os.execv(sys.argv[0], sys.argv)
-                # self.terminate_app()
-                
-                
-                
-            #     self.pb_start_radio.clearFocus()
-            # finally:
-            #     self.pb_start_radio.destroy()
-
+        self.activate_process()
+        self.stream = self.stream_signal(self.radio_process.stdout)
+        next(self.stream)  # start the stream, stream.send()
+        self.dev.start(self.stream)
+    
     def stop_listening(self):
-        # print(self.proc_nb)
         if self.is_listening():
-            try:
-                self.lb_le_now_listen.clear()
-                self.lb_radio_icon_big.clear()
-                self.proc_nb.kill()
-                self.proc_nb.wait(timeout=5)
-                sys.stdout.flush()
-            except subprocess.TimeoutExpired:
-                self.proc_nb.kill()
-                sys.stdout.flush()
-            except Exception as e:
-                raise
-            finally:
-                self.proc_nb = None
-        else:
-            self.terminate_app()
-
-        # proc = psutil.Process(self.proc_nb.pid)
-        # print(proc.name(), proc.status())
-        
-        # print(self.proc_nb.name, '\n', self.proc_nb.pid, '\n', self.proc_nb.status)
-        # procc = {}
-        # all_processes = psutil.process_iter(attrs=['pid', 'name'])
-        # for pr in all_processes:
-        #     if pr.info['name'] == self.proc_nb.name and  pr.info['pid'] == self.proc_nb.pid
-        #     print()
-        #     procc[] =
-        #     pr.info['name']
-        # print()
-        # parrent_pid = os.getppid()
-        # print(parrent_pid, procc[parrent_pid])
-        # 
-        
-        # print(all_processes)
-
-    # def stop_listening(self):
-    #     if self.is_listening():
-    #         print(self.is_listening(), 'terminate')
-    #         self.radio_process.terminate()
-    #         # self.radio_process.wait(timeout=0.1)  # terminates whole app
-            
-    #         # self.audio_device.stop()
-    #         time.sleep(0.5)
-    #         if self.is_listening():
-    #             print(self.is_listening(), 'kill')
-    #             self.radio_process.kill()
-    #             # self.radio_process.returncode
-    #             # gc.collect()  # garbage collector
-    #             # self.proc.memory_info().rss  # free up memory
-    #             # self.audio_device.close()
-                
-    #     self.radio_process = None
+            self.dev.stop()
+            self.stream.close()
     
     def is_listening(self):
         # poll() returns None if not exited yet
-        return self.radio_process is not None and self.radio_process.poll() is None
+        return self.radio_process is not None\
+            and self.radio_process.poll() is None
     
-    def terminate_app(self):
-        parrent_pid = os.getppid()
-        os.kill(parrent_pid, signal.SIGINT)
-        
-    def prompt(self):
-        try:
-            input()
-        except RuntimeError():
-            return None
-        finally:
-            return None
-    
-    def force_prompt(self):
-        close = None
-        while close is None:
-            close = self.prompt()
-        return close
-    
-    def get_execute_input(self):
-        close = self.force_prompt()
-        try:
-            self.execute(close)
-        except CommandError as e:
-            print(e)
-    
-    def execute(self, command):
-        command = input()
+    def set_radio_volume(self):
+        pass
 
 
 class Messages(MainClass):
