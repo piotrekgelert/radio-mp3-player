@@ -14,6 +14,16 @@ for AAC streaming download FFMPEG [https://ffmpeg.org/download.html],
 next add to the PATH on windows eg: `C:\ffmpeg\bin`, restart computer and done
 Python Core Audio Windows Library (pycaw 20240210) [https://github.com/AndreMiras/pycaw]
 
+to set audio volume in miniaudio
+
+
+    import miniaudio
+    stream = miniaudio.stream_file("inc/xm/Toni Leys - Through A Cardboard World.mp3")
+    device = miniaudio.PlaybackDevice()
+    device._device.masterVolumeFactor = 0.2 # <--device.start(stream)
+
+It supports both a volume factor (0..1) and gain in decibels 
+(0 is full volume, < 0 reduces the volume).
 
 ### progress
 - [x] bla
@@ -21,3 +31,8 @@ Python Core Audio Windows Library (pycaw 20240210) [https://github.com/AndreMira
 - [ ] kla
 - - [x] plo
 - - [ ] fla
+
+if you want to change volume in radio:
+- stop listening radio if you already started
+- change volume 
+- start listening radio

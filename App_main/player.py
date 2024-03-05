@@ -28,12 +28,13 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     songs_duration: int = 0
     is_playing: bool = False
     is_paused: bool = False
-    radio_checked: bool = False
+    # radio_checked: bool = False
     playing_num: str = ''
-    on_off: bool = False
+    # on_off: bool = False
     radio_process = None
     threadd: Thread = None
-    dev = None
+    dev: subprocess = None
+    radio_vol: float = 0.0
     
     def __init__(self):
         super().__init__()
@@ -52,11 +53,14 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_previous.clicked.connect(self.prev_song)
         self.pb_next.clicked.connect(self.next_song)
         
+
         self.button_clicked_connnect()
         self.pb_start_radio.clicked.connect(self.start_listening)
         self.pb_start_radio.clicked.connect(self.activate_process)
-        
         self.pb_stop_radio.clicked.connect(self.stop_listening)
+        
+        self.dl_radio_volume.valueChanged.connect(self.radio_volume_set)
+
     
     def add_songs(self):
         s_path = qtw.QFileDialog.getExistingDirectory()
@@ -118,17 +122,17 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         label = qtw.QListWidgetItem(song)
         self.lw_songs.addItem(label)
         
-    def song_chosen(self, item:qtw.QListWidgetItem):
-        song = item.text().split(':')[0]
-        self.lb_le_now_play.setText(song)
-    
     def song_dict(self, file_link:str):
         if len(self.songs):
             song_idx = [x for x in self.songs.keys()][-1]
             self.songs[song_idx+1] = file_link
         else:
             self.songs[0] = file_link
-
+    
+    def song_chosen(self, item:qtw.QListWidgetItem):
+        song = item.text().split(':')[0]
+        self.lb_le_now_play.setText(song)
+    
     def clear_song_list(self):
         self.songs.clear()
         self.lb_le_now_play.clear()
@@ -168,9 +172,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.is_paused = True
         elif self.is_paused and not self.is_playing:
             pygame.mixer.music.unpause()
-        self.lb_le_status.setText('Playing')
-        self.is_playing = True
-        self.is_paused = False
+            self.lb_le_status.setText('Playing')
+            self.is_playing = True
+            self.is_paused = False
     
     def prev_song(self):
         current = self.lw_songs.currentRow()
@@ -316,6 +320,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         if self.threadd is None or not self.threadd.is_alive():
             self.threadd = Thread(target=self.listening)
             self.threadd.start()
+            self.lb_le_radio_status.setText('is running')
     
     
     def listening(self):
@@ -331,20 +336,33 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.activate_process()
         self.stream = self.stream_signal(self.radio_process.stdout)
         next(self.stream)  # start the stream, stream.send()
+        self.dev._device.masterVolumeFactor = self.radio_vol
         self.dev.start(self.stream)
     
     def stop_listening(self):
         if self.is_listening():
             self.dev.stop()
             self.stream.close()
+            self.lb_le_radio_status.setText('stopped')
+
     
     def is_listening(self):
         # poll() returns None if not exited yet
         return self.radio_process is not None\
             and self.radio_process.poll() is None
     
-    def set_radio_volume(self):
-        pass
+    def radio_volume_set(self):
+        r_vol: int = self.dl_radio_volume.value()
+        
+        radio_vol_dict: dict = {
+            0: ('0', 0.0), 1: ('1', 0.1), 2: ('2', 0.2), 3: ('3', 0.3),
+            4: ('4', 0.4), 5: ('5', 0.5), 6: ('6', 0.6), 7: ('7', 0.7),
+            8: ('8', 0.8), 9: ('9', 0.9), 10: ('10', 1.0),
+            }
+        self.lcd_radio_vol.display(radio_vol_dict[r_vol][0])
+        self.radio_vol: float = radio_vol_dict[r_vol][1]
+
+    
 
 
 class Messages(MainClass):
@@ -366,6 +384,9 @@ class Messages(MainClass):
         self.lb_radio_message.setStyleSheet(
             'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
         )
+    
+    def still_listening(self):
+        self.lb_radio_message.setText('Radiostation is still working')
 
 
 class CommandError(Exception):
