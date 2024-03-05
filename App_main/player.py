@@ -35,12 +35,21 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     threadd: Thread = None
     dev: subprocess = None
     radio_vol: float = 0.0
+    styles = {
+        'buttons': 'color: rgb(255, 255, 255);background-color: rgb(170, 170, 255);font: 12pt "Comic Sans MS";',
+        'frames': 'background-color: rgb(56, 56, 56);',
+        'messages': 'color: rgb(255, 255, 255); background-color: rgb(56, 56, 56);',
+    }
     
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.radio_buttons()
         self.pygame_init()
+        self.initial_radio_volume_set()
+        SetupColors.buttons(self)
+        SetupColors.frames(self)
+        SetupColors.messags(self)
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
         self.pb_remove_all.clicked.connect(self.clear_song_list)
@@ -60,6 +69,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_stop_radio.clicked.connect(self.stop_listening)
         
         self.dl_radio_volume.valueChanged.connect(self.radio_volume_set)
+        
 
     
     def add_songs(self):
@@ -200,14 +210,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             10: (10, 2)
         }
         self.lcd_song_volume.display(vol[volume][0])
-        pygame.mixer.music.set_volume(vol[volume][1])
-        if self.is_playing and not self.is_paused:
-            pygame.mixer.music.pause()
-            self.lb_le_status.setText('Paused')
-            self.is_playing = False
-            self.is_paused = True
-        elif self.is_paused and not self.is_playing:
-            pygame.mixer.music.unpause()      
+        pygame.mixer.music.set_volume(vol[volume][1])   
 
     def root_path(self, destination_folder: str) -> str:
         root_path = r''.format(pathlib.Path(__file__).parent.absolute().parent)
@@ -351,6 +354,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         return self.radio_process is not None\
             and self.radio_process.poll() is None
     
+    def initial_radio_volume_set(self):
+        self.radio_vol: float = 0.5
+        self.lcd_radio_vol.display('5')
+        self.dl_radio_volume.setValue(5)
+    
     def radio_volume_set(self):
         r_vol: int = self.dl_radio_volume.value()
         
@@ -363,7 +371,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.radio_vol: float = radio_vol_dict[r_vol][1]
 
     
-
 
 class Messages(MainClass):
 
@@ -388,6 +395,32 @@ class Messages(MainClass):
     def still_listening(self):
         self.lb_radio_message.setText('Radiostation is still working')
 
+
+class SetupColors(MainClass):
+    
+    def buttons(self):
+        self.pb_add_file.setStyleSheet(self.styles['buttons'])
+        self.pb_add_folder.setStyleSheet(self.styles['buttons'])
+        self.pb_remove_all.setStyleSheet(self.styles['buttons'])
+        self.pb_start.setStyleSheet(self.styles['buttons'])
+        self.pb_stop.setStyleSheet(self.styles['buttons'])
+        self.pb_pause.setStyleSheet(self.styles['buttons'])
+        self.pb_previous.setStyleSheet(self.styles['buttons'])
+        self.pb_next.setStyleSheet(self.styles['buttons'])
+        self.pb_start_radio.setStyleSheet(self.styles['buttons'])
+        self.pb_stop_radio.setStyleSheet(self.styles['buttons'])
+
+    def frames(self):
+        self.fr_play_buttons.setStyleSheet(self.styles['frames'])
+        self.fr_add_rem_buttons.setStyleSheet(self.styles['frames'])
+        self.fr_empty.setStyleSheet(self.styles['frames'])
+        self.fr_mp_message.setStyleSheet(self.styles['frames'])
+        self.fr_radio_buttons.setStyleSheet(self.styles['frames'])
+        self.fr_radio_message.setStyleSheet(self.styles['frames'])
+    
+    def messags(self):
+        self.fr_mp_message.setStyleSheet(self.styles['messages'])
+        self.fr_radio_message.setStyleSheet(self.styles['messages'])
 
 class CommandError(Exception):
     pass
