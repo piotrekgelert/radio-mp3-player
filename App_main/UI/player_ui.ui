@@ -33,7 +33,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tb_player">
      <attribute name="title">
@@ -311,9 +311,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>510</y>
+        <y>520</y>
         <width>771</width>
-        <height>121</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="title">
@@ -326,7 +326,7 @@
        <property name="geometry">
         <rect>
          <x>250</x>
-         <y>30</y>
+         <y>20</y>
          <width>91</width>
          <height>81</height>
         </rect>
@@ -341,7 +341,7 @@
          <x>360</x>
          <y>30</y>
          <width>171</width>
-         <height>81</height>
+         <height>71</height>
         </rect>
        </property>
       </widget>

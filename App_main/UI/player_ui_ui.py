@@ -96,15 +96,15 @@ class Ui_mw_main(object):
         self.lb_mp_message.setGeometry(QtCore.QRect(16, 10, 741, 31))
         self.lb_mp_message.setObjectName("lb_mp_message")
         self.groupBox = QtWidgets.QGroupBox(parent=self.tb_player)
-        self.groupBox.setGeometry(QtCore.QRect(10, 510, 771, 121))
+        self.groupBox.setGeometry(QtCore.QRect(10, 520, 771, 111))
         self.groupBox.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.groupBox.setObjectName("groupBox")
         self.dl_song_volume = QtWidgets.QDial(parent=self.groupBox)
-        self.dl_song_volume.setGeometry(QtCore.QRect(250, 30, 91, 81))
+        self.dl_song_volume.setGeometry(QtCore.QRect(250, 20, 91, 81))
         self.dl_song_volume.setMaximum(10)
         self.dl_song_volume.setObjectName("dl_song_volume")
         self.lcd_song_volume = QtWidgets.QLCDNumber(parent=self.groupBox)
-        self.lcd_song_volume.setGeometry(QtCore.QRect(360, 30, 171, 81))
+        self.lcd_song_volume.setGeometry(QtCore.QRect(360, 30, 171, 71))
         self.lcd_song_volume.setObjectName("lcd_song_volume")
         self.tb_main.addTab(self.tb_player, "")
         self.tb_radio = QtWidgets.QWidget()
@@ -287,7 +287,7 @@ class Ui_mw_main(object):
         mw_main.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(mw_main)
-        self.tb_main.setCurrentIndex(0)
+        self.tb_main.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(mw_main)
 
     def retranslateUi(self, mw_main):

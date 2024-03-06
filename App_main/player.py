@@ -16,29 +16,30 @@ import pygame
 import PyQt6.QtCore as qtc
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
+import requests
 from tinytag import TinyTag as tag
 from UI.player_ui_ui import Ui_mw_main
 
 log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=log.DEBUG)
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
-    proc_nb = None
-    # process = None
     songs: dict = {}
+    songs_len: int = 0
     songs_duration: int = 0
     is_playing: bool = False
     is_paused: bool = False
     # radio_checked: bool = False
     playing_num: str = ''
-    # on_off: bool = False
     radio_process = None
     threadd: Thread = None
     dev: subprocess = None
     radio_vol: float = 0.0
+    internet_connection: bool = None
     styles = {
         'buttons': 'color: rgb(255, 255, 255);background-color: rgb(170, 170, 255);font: 12pt "Comic Sans MS";',
         'frames': 'background-color: rgb(56, 56, 56);',
         'messages': 'color: rgb(255, 255, 255); background-color: rgb(56, 56, 56);',
+        'background': 'background-color: rgb(80, 80, 80);'
     }
     
     def __init__(self):
@@ -47,9 +48,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.radio_buttons()
         self.pygame_init()
         self.initial_radio_volume_set()
-        SetupColors.buttons(self)
-        SetupColors.frames(self)
-        SetupColors.messags(self)
+        self.net_check()
+        # SetupColors.buttons(self)
+        # SetupColors.frames(self)
+        # SetupColors.messags(self)
+        # SetupColors.background(self)
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
         self.pb_remove_all.clicked.connect(self.clear_song_list)
@@ -70,18 +73,26 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         self.dl_radio_volume.valueChanged.connect(self.radio_volume_set)
         
-
-    
     def add_songs(self):
-        s_path = qtw.QFileDialog.getExistingDirectory()
-        for file in os.listdir(s_path):
-            fpath = os.path.join(s_path, file)
-            self.set_song(fpath)
+        self.lb_mp_message.clear()
+        try:
+            s_path = qtw.QFileDialog.getExistingDirectory()
+            ls_songs = os.listdir(s_path)
+            self.songs_len = len(ls_songs)
+            for file in ls_songs:
+                fpath = os.path.join(s_path, file)
+                self.set_song(fpath)
+        except:
+            Messages.not_added(self)
 
     def add_song(self):
-        s_path = qtw.QFileDialog.getOpenFileName()
-        file:str = s_path[0]
-        self.set_song(file)
+        self.lb_mp_message.clear()
+        try:
+            s_path = qtw.QFileDialog.getOpenFileName()
+            file:str = s_path[0]
+            self.set_song(file)
+        except:
+            Messages.not_added(self)
         # print(file)
         # print(tag.is_supported(file))
         
@@ -187,19 +198,24 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.is_paused = False
     
     def prev_song(self):
+        self.lb_mp_message.clear()
         current = self.lw_songs.currentRow()
         if current < 1:
             Messages.no_song(self)
         else:
+            if not self.pb_next.isEnabled():
+                self.pb_next.setEnabled(True)
+                self.lb_mp_message.clear()
             self.lw_songs.setCurrentRow(current - 1)
             self.song_chosen(self.lw_songs.currentItem())
-    
+            
     def next_song(self):
+        self.lb_mp_message.clear()
         current = self.lw_songs.currentRow()
-        try:
+        if current+2 < self.lw_songs.count():
             self.lw_songs.setCurrentRow(current + 1)
             self.song_chosen(self.lw_songs.currentItem())
-        except:
+        else:
             Messages.no_song(self)
 
     def volume_set(self):
@@ -304,7 +320,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         try:
             proc = psutil.Process(self.radio_process.pid)
-            self.proc_nb = proc
             # proc_name = psutil.Process(self.radio_process.args)
             if proc.status() == psutil.STATUS_ZOMBIE:
 
@@ -320,34 +335,40 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             return False
     
     def start_listening(self):
-        if self.threadd is None or not self.threadd.is_alive():
-            self.threadd = Thread(target=self.listening)
-            self.threadd.start()
-            self.lb_le_radio_status.setText('is running')
-    
-    
+        if self.internet_connection:
+            if self.threadd is None or not self.threadd.is_alive():
+                self.threadd = Thread(target=self.listening)
+                self.threadd.start()
+                self.lb_le_radio_status.setText('is running')
+                self.pb_start_radio.setEnabled(False)
+        else:
+            Messages.no_net(self)
+            
     def listening(self):
         info: json = self.get_button_data('radio_web_format.json')
         filename: str = info[f'butt_{self.playing_num}']['web']
         channels: int = 2
         sample_rate: int = 44100
-
         self.dev = self.audio_device()
         self.radio_process = self.process_device(
                 filename, channels, sample_rate
                 )
         self.activate_process()
+        
         self.stream = self.stream_signal(self.radio_process.stdout)
         next(self.stream)  # start the stream, stream.send()
-        self.dev._device.masterVolumeFactor = self.radio_vol
-        self.dev.start(self.stream)
     
+            
+        self.dev._device.masterVolumeFactor = self.radio_vol
+    
+        self.dev.start(self.stream)
+        
     def stop_listening(self):
         if self.is_listening():
             self.dev.stop()
             self.stream.close()
             self.lb_le_radio_status.setText('stopped')
-
+            self.pb_start_radio.setEnabled(True)
     
     def is_listening(self):
         # poll() returns None if not exited yet
@@ -369,6 +390,15 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             }
         self.lcd_radio_vol.display(radio_vol_dict[r_vol][0])
         self.radio_vol: float = radio_vol_dict[r_vol][1]
+    
+    def net_check(self):
+        try:
+            response = requests.get('https://www.google.com')
+            if response.status_code == 200:
+                self.internet_connection = True
+        except requests.ConnectionError:
+            self.internet_connection = False
+
 
     
 
@@ -394,33 +424,44 @@ class Messages(MainClass):
     
     def still_listening(self):
         self.lb_radio_message.setText('Radiostation is still working')
-
-
-class SetupColors(MainClass):
     
-    def buttons(self):
-        self.pb_add_file.setStyleSheet(self.styles['buttons'])
-        self.pb_add_folder.setStyleSheet(self.styles['buttons'])
-        self.pb_remove_all.setStyleSheet(self.styles['buttons'])
-        self.pb_start.setStyleSheet(self.styles['buttons'])
-        self.pb_stop.setStyleSheet(self.styles['buttons'])
-        self.pb_pause.setStyleSheet(self.styles['buttons'])
-        self.pb_previous.setStyleSheet(self.styles['buttons'])
-        self.pb_next.setStyleSheet(self.styles['buttons'])
-        self.pb_start_radio.setStyleSheet(self.styles['buttons'])
-        self.pb_stop_radio.setStyleSheet(self.styles['buttons'])
-
-    def frames(self):
-        self.fr_play_buttons.setStyleSheet(self.styles['frames'])
-        self.fr_add_rem_buttons.setStyleSheet(self.styles['frames'])
-        self.fr_empty.setStyleSheet(self.styles['frames'])
-        self.fr_mp_message.setStyleSheet(self.styles['frames'])
-        self.fr_radio_buttons.setStyleSheet(self.styles['frames'])
-        self.fr_radio_message.setStyleSheet(self.styles['frames'])
+    def not_added(self):
+        self.lb_mp_message.setText('There is nothing added to the list')
     
-    def messags(self):
-        self.fr_mp_message.setStyleSheet(self.styles['messages'])
-        self.fr_radio_message.setStyleSheet(self.styles['messages'])
+    def no_net(self):
+        self.lb_radio_message.setText('No internet connection, establish connection and restart an app')
+        self.lb_radio_message.setStyleSheet(
+            'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+        )
+
+# class SetupColors(MainClass):
+    
+#     def buttons(self):
+#         self.pb_add_file.setStyleSheet(self.styles['buttons'])
+#         self.pb_add_folder.setStyleSheet(self.styles['buttons'])
+#         self.pb_remove_all.setStyleSheet(self.styles['buttons'])
+#         self.pb_start.setStyleSheet(self.styles['buttons'])
+#         self.pb_stop.setStyleSheet(self.styles['buttons'])
+#         self.pb_pause.setStyleSheet(self.styles['buttons'])
+#         self.pb_previous.setStyleSheet(self.styles['buttons'])
+#         self.pb_next.setStyleSheet(self.styles['buttons'])
+#         self.pb_start_radio.setStyleSheet(self.styles['buttons'])
+#         self.pb_stop_radio.setStyleSheet(self.styles['buttons'])
+
+#     def frames(self):
+#         self.fr_play_buttons.setStyleSheet(self.styles['frames'])
+#         self.fr_add_rem_buttons.setStyleSheet(self.styles['frames'])
+#         self.fr_empty.setStyleSheet(self.styles['frames'])
+#         self.fr_mp_message.setStyleSheet(self.styles['frames'])
+#         self.fr_radio_buttons.setStyleSheet(self.styles['frames'])
+#         self.fr_radio_message.setStyleSheet(self.styles['frames'])
+    
+#     def messags(self):
+#         self.fr_mp_message.setStyleSheet(self.styles['messages'])
+#         self.fr_radio_message.setStyleSheet(self.styles['messages'])
+    
+#     def background(self):
+#         self.tb_main.setStyleSheet(self.styles['background'])
 
 class CommandError(Exception):
     pass
