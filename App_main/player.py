@@ -45,6 +45,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.application_icons()
         self.radio_buttons()
         self.pygame_init()
         self.initial_radio_volume_set()
@@ -221,9 +222,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def volume_set(self):
         volume = self.dl_song_volume.value()
         vol = {
-            0: (0, 0.0), 1: (1, 0.2), 2: (2, 0.4), 3: (3, 0.6), 4: (4, 0.8),
-            5: (5, 1), 6: (6, 1.2), 7: (7, 1.4), 8: (8, 1.6), 9: (9, 1.8),
-            10: (10, 2)
+            0: (0, 0.0), 1: (1, 0.3), 2: (2, 0.6), 3: (3, 0.9), 4: (4, 1.2),
+            5: (5, 1.5), 6: (6, 1.8), 7: (7, 2.1), 8: (8, 2.4), 9: (9, 2.7),
+            10: (10, 3)
         }
         self.lcd_song_volume.display(vol[volume][0])
         pygame.mixer.music.set_volume(vol[volume][1])   
@@ -398,8 +399,36 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 self.internet_connection = True
         except requests.ConnectionError:
             self.internet_connection = False
+    
+    def setup_tabs(self, main_path: str):
+        def func(tab: qtw.QWidget, tab_name: str):
+            tab.setWindowIcon(qtg.QIcon('{}\\{}'.format(main_path, tab_name)))
+        return func
+    
+    def setup_icons(self, main_path: str):
+        def func(butt:qtw.QPushButton, icon_name:str):
+            butt.setIcon(qtg.QIcon('{}\\{}'.format(main_path, icon_name)))
+        return func
+    
+    def application_icons(self):
+        root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
+        main_path = os.path.join(root_folder, 'App_icons')
+        
+        tab = self.setup_tabs(main_path)
+        tab(self.tb_player, 'player_icon_button_117x64.png')
+        tab(self.tb_radio, 'radio_icon_button_70x64.png')
 
-
+        button = self.setup_icons(main_path)
+        button(self.pb_add_file, 'import_file_button_56x64.png')
+        button(self.pb_add_folder, 'import_folder_button_49x64.png')
+        button(self.pb_remove_all, 'remove_all_button_50x64.png')
+        button(self.pb_start, 'play_button_64x64.png')
+        button(self.pb_stop, 'stop_button_64x64.png')
+        button(self.pb_pause, 'pause_unpause_button_89x64.png')
+        button(self.pb_next, 'forward_button_64x54.png')
+        button(self.pb_previous, 'backward_button_63x53.png')
+        button(self.pb_start_radio, 'play_button_64x64.png')
+        button(self.pb_stop_radio, 'stop_button_64x64.png')
     
 
 class Messages(MainClass):

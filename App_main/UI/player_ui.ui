@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>828</width>
-    <height>763</height>
+    <height>813</height>
    </rect>
   </property>
   <property name="font">
@@ -26,16 +26,26 @@
       <x>20</x>
       <y>20</y>
       <width>791</width>
-      <height>731</height>
+      <height>791</height>
      </rect>
     </property>
     <property name="tabPosition">
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>117</width>
+      <height>64</height>
+     </size>
     </property>
     <widget class="QWidget" name="tb_player">
+     <attribute name="icon">
+      <iconset>
+       <normaloff>../../App_icons/player_icon_button_117x64.png</normaloff>../../App_icons/player_icon_button_117x64.png</iconset>
+     </attribute>
      <attribute name="title">
       <string>Mp3 Player</string>
      </attribute>
@@ -72,9 +82,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>80</y>
         <width>161</width>
-        <height>161</height>
+        <height>251</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -87,13 +97,19 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
+         <y>90</y>
          <width>141</width>
-         <height>41</height>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
         <string>Add Folder</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>49</width>
+         <height>64</height>
+        </size>
        </property>
       </widget>
       <widget class="QPushButton" name="pb_add_file">
@@ -102,24 +118,36 @@
          <x>10</x>
          <y>10</y>
          <width>141</width>
-         <height>41</height>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
         <string>Add Song</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>56</width>
+         <height>64</height>
+        </size>
        </property>
       </widget>
       <widget class="QPushButton" name="pb_remove_all">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>110</y>
+         <y>170</y>
          <width>141</width>
-         <height>41</height>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
-        <string>Remove all songs</string>
+        <string>Remove all</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>50</width>
+         <height>64</height>
+        </size>
        </property>
       </widget>
      </widget>
@@ -127,7 +155,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>270</y>
+        <y>330</y>
         <width>161</width>
         <height>80</height>
        </rect>
@@ -161,7 +189,7 @@
         <x>180</x>
         <y>80</y>
         <width>601</width>
-        <height>151</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -173,53 +201,77 @@
       <widget class="QPushButton" name="pb_start">
        <property name="geometry">
         <rect>
-         <x>90</x>
-         <y>30</y>
-         <width>101</width>
-         <height>41</height>
+         <x>70</x>
+         <y>10</y>
+         <width>121</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
         <string>Play</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
        </property>
       </widget>
       <widget class="QPushButton" name="pb_pause">
        <property name="geometry">
         <rect>
          <x>330</x>
-         <y>30</y>
-         <width>131</width>
-         <height>41</height>
+         <y>10</y>
+         <width>221</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
         <string>Pause/Unpause</string>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>89</width>
+         <height>64</height>
+        </size>
+       </property>
       </widget>
       <widget class="QPushButton" name="pb_stop">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>30</y>
-         <width>101</width>
-         <height>41</height>
+         <x>200</x>
+         <y>10</y>
+         <width>121</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
         <string>Stop</string>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
+       </property>
       </widget>
       <widget class="QPushButton" name="pb_previous">
        <property name="geometry">
         <rect>
-         <x>170</x>
+         <x>160</x>
          <y>90</y>
-         <width>101</width>
-         <height>41</height>
+         <width>111</width>
+         <height>61</height>
         </rect>
        </property>
        <property name="text">
         <string>Prev</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>63</width>
+         <height>53</height>
+        </size>
        </property>
       </widget>
       <widget class="QPushButton" name="pb_next">
@@ -227,12 +279,18 @@
         <rect>
          <x>280</x>
          <y>90</y>
-         <width>101</width>
-         <height>41</height>
+         <width>121</width>
+         <height>61</height>
         </rect>
        </property>
        <property name="text">
         <string>Next</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>64</width>
+         <height>54</height>
+        </size>
        </property>
       </widget>
      </widget>
@@ -240,9 +298,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>360</y>
+        <y>420</y>
         <width>161</width>
-        <height>151</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -256,7 +314,7 @@
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>240</y>
+        <y>260</y>
         <width>601</width>
         <height>271</height>
        </rect>
@@ -282,7 +340,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>640</y>
+        <y>660</y>
         <width>771</width>
         <height>51</height>
        </rect>
@@ -311,7 +369,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>520</y>
+        <y>540</y>
         <width>771</width>
         <height>111</height>
        </rect>
@@ -348,6 +406,10 @@
      </widget>
     </widget>
     <widget class="QWidget" name="tb_radio">
+     <attribute name="icon">
+      <iconset>
+       <normaloff>../../App_icons/radio_icon_button_70x64.png</normaloff>../../App_icons/radio_icon_button_70x64.png</iconset>
+     </attribute>
      <attribute name="title">
       <string>Online radio</string>
      </attribute>
@@ -412,27 +474,39 @@
       <widget class="QPushButton" name="pb_start_radio">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>20</y>
-         <width>161</width>
-         <height>61</height>
+         <x>50</x>
+         <y>10</y>
+         <width>191</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
         <string>Start listening</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
        </property>
       </widget>
       <widget class="QPushButton" name="pb_stop_radio">
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>20</y>
-         <width>161</width>
-         <height>61</height>
+         <y>10</y>
+         <width>181</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
         <string>Stop listening</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>64</width>
+         <height>64</height>
+        </size>
        </property>
       </widget>
      </widget>
@@ -946,11 +1020,6 @@ Breakfast with Liam and Venetia</string>
        </property>
       </widget>
      </widget>
-    </widget>
-    <widget class="QWidget" name="tb_settings">
-     <attribute name="title">
-      <string>Settings</string>
-     </attribute>
     </widget>
    </widget>
   </widget>
