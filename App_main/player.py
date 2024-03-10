@@ -166,6 +166,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         pygame.mixer.music.set_volume(0.0)
     
     def play(self):
+        lab_img = self.setup_pixels(self.icons_path())
         if len(self.songs) > 0:
             if self.lw_songs.currentRow() >= 0:
                 pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
@@ -175,26 +176,43 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 if not self.is_playing:
                     self.is_playing = True
                     self.lb_le_status.setText('Playing')
+                    lab_img(
+                        self.lb_le_status_icon, 'play_mp3_status_75x64.png'
+                        )
             else:
                 Messages.non_selected(self)
         else:
             Messages.no_song(self)
     
     def stop(self):
+        lab_img = self.setup_pixels(self.icons_path())
         pygame.mixer.music.stop()
         self.lb_le_status.setText('Stopped')
+        
         if self.is_playing:
             self.is_playing = False
+        lab_img(
+            self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
+            )
+        
     
     def pause(self):
+        lab_img = self.setup_pixels(self.icons_path())
         if self.is_playing and not self.is_paused:
             pygame.mixer.music.pause()
             self.lb_le_status.setText('Paused')
+            lab_img(
+                self.lb_le_status_icon, 'pause_mp3_status_75x64.png'
+                )
+            
             self.is_playing = False
             self.is_paused = True
         elif self.is_paused and not self.is_playing:
             pygame.mixer.music.unpause()
             self.lb_le_status.setText('Playing')
+            lab_img(
+                self.lb_le_status_icon, 'play_mp3_status_75x64.png'
+                )
             self.is_playing = True
             self.is_paused = False
     
@@ -340,8 +358,13 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             if self.threadd is None or not self.threadd.is_alive():
                 self.threadd = Thread(target=self.listening)
                 self.threadd.start()
-                self.lb_le_radio_status.setText('is running')
                 self.pb_start_radio.setEnabled(False)
+                self.lb_le_radio_status.setText('is running')
+                lab_img = self.setup_pixels(self.icons_path())
+                lab_img(
+                    self.lb_le_radio_status_icon,
+                    'listening_status_63x56.png')
+                
         else:
             Messages.no_net(self)
             
@@ -370,6 +393,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.stream.close()
             self.lb_le_radio_status.setText('stopped')
             self.pb_start_radio.setEnabled(True)
+            lab_img = self.setup_pixels(self.icons_path())
+            lab_img(
+                self.lb_le_radio_status_icon,
+                'not_listening_status_63x56.png')
+            
     
     def is_listening(self):
         # poll() returns None if not exited yet
@@ -400,6 +428,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         except requests.ConnectionError:
             self.internet_connection = False
     
+    def icons_path(self):
+        root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
+        return os.path.join(root_folder, 'App_icons')
+
+    
     def setup_tabs(self, main_path: str):
         def func(tab: qtw.QWidget, tab_name: str):
             tab.setWindowIcon(qtg.QIcon('{}\\{}'.format(main_path, tab_name)))
@@ -410,9 +443,14 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             butt.setIcon(qtg.QIcon('{}\\{}'.format(main_path, icon_name)))
         return func
     
+    def setup_pixels(self, main_path: str):
+        def func(lb:qtw.QLabel, icon_name: str):
+            lb.setPixmap(qtg.QPixmap('{}\\{}'.format(main_path, icon_name)))
+        return func
+    
     def application_icons(self):
-        root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
-        main_path = os.path.join(root_folder, 'App_icons')
+        main_path = self.icons_path()
+        
         
         tab = self.setup_tabs(main_path)
         tab(self.tb_player, 'player_icon_button_117x64.png')
@@ -429,6 +467,10 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         button(self.pb_previous, 'backward_button_63x53.png')
         button(self.pb_start_radio, 'play_button_64x64.png')
         button(self.pb_stop_radio, 'stop_button_64x64.png')
+
+        lab_img = self.setup_pixels(main_path)
+        lab_img(self.lb_le_radio_status_icon, 'not_listening_status_63x56.png')
+        lab_img(self.lb_le_status_icon, 'stop_mp3_status_75x64.png')
     
 
 class Messages(MainClass):
