@@ -3,17 +3,13 @@ import json
 import logging as log
 import os
 import pathlib
-import signal
 import subprocess
 import sys
-import threading
-import time
 from threading import Thread
 
 import miniaudio
 import psutil
 import pygame
-import PyQt6.QtCore as qtc
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
 import requests
@@ -28,7 +24,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     songs_duration: int = 0
     is_playing: bool = False
     is_paused: bool = False
-    # radio_checked: bool = False
     playing_num: str = ''
     radio_process = None
     threadd: Thread = None
@@ -45,15 +40,12 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        qtw.QDialog.setFixedSize(self, 830,  825)
         self.application_icons()
         self.radio_buttons()
         self.pygame_init()
         self.initial_radio_volume_set()
         self.net_check()
-        # SetupColors.buttons(self)
-        # SetupColors.frames(self)
-        # SetupColors.messags(self)
-        # SetupColors.background(self)
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
         self.pb_remove_all.clicked.connect(self.clear_song_list)
@@ -66,7 +58,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.pb_previous.clicked.connect(self.prev_song)
         self.pb_next.clicked.connect(self.next_song)
         
-
         self.button_clicked_connnect()
         self.pb_start_radio.clicked.connect(self.start_listening)
         self.pb_start_radio.clicked.connect(self.activate_process)
@@ -94,18 +85,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.set_song(file)
         except:
             Messages.not_added(self)
-        # print(file)
-        # print(tag.is_supported(file))
-        
-        # print(f'album: {info.album}')
-        # print(f'album artist: {info.albumartist}')
-        # print(f'artist: {info.artist}')
-        # print(f'composer: {info.composer}')
-        # print(f'title: {info.title}')
-        # print(f'comment: {info.comment}')
-        # print(f'duration: {info.duration}')
-        # print(f'genre: {info.genre}')
-
     
     def song_time(self, inf):
         hours = int(inf // 3600)
@@ -180,7 +159,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                         self.lb_le_status_icon, 'play_mp3_status_75x64.png'
                         )
             else:
-                Messages.non_selected(self)
+                Messages.no_song_selected(self)
         else:
             Messages.no_song(self)
     
@@ -195,7 +174,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
             )
         
-    
     def pause(self):
         lab_img = self.setup_pixels(self.icons_path())
         if self.is_playing and not self.is_paused:
@@ -288,11 +266,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lb_radio_icon_big.setPixmap(
             qtg.QPixmap(os.path.join(main_path, info[f'butt_{num}']['icon']))
             )
-        # print(nb, num, '\n',
-        #       info[f'butt_{num}']['name'],'\n',
-        #       info[f'butt_{num}']['desc'],'\n',
-        #       os.path.join(main_path, info[f'butt_{num}']['icon']), '\n',
-        #       main_path)
     
     def connect_buttons(self):
         def func(pbr: qtw.QPushButton, nb:int):
@@ -354,19 +327,24 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             return False
     
     def start_listening(self):
-        if self.internet_connection:
-            if self.threadd is None or not self.threadd.is_alive():
-                self.threadd = Thread(target=self.listening)
-                self.threadd.start()
-                self.pb_start_radio.setEnabled(False)
-                self.lb_le_radio_status.setText('is running')
-                lab_img = self.setup_pixels(self.icons_path())
-                lab_img(
-                    self.lb_le_radio_status_icon,
-                    'listening_status_63x56.png')
-                
-        else:
-            Messages.no_net(self)
+        try:
+            if self.internet_connection:
+                if len(self.lb_le_now_listen.text()):
+                    if self.threadd is None or not self.threadd.is_alive():
+                        self.threadd = Thread(target=self.listening)
+                        self.threadd.start()
+                        self.pb_start_radio.setEnabled(False)
+                        self.lb_le_radio_status.setText('running')
+                        lab_img = self.setup_pixels(self.icons_path())
+                        lab_img(
+                            self.lb_le_radio_status_icon,
+                            'listening_status_63x56.png')
+                else:
+                    Messages.no_radio_selected(self)      
+            else:
+                Messages.no_net(self)
+        except:
+            Messages.no_ffmpeg(self)
             
     def listening(self):
         info: json = self.get_button_data('radio_web_format.json')
@@ -382,9 +360,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.stream = self.stream_signal(self.radio_process.stdout)
         next(self.stream)  # start the stream, stream.send()
     
-            
         self.dev._device.masterVolumeFactor = self.radio_vol
-    
         self.dev.start(self.stream)
         
     def stop_listening(self):
@@ -398,7 +374,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 self.lb_le_radio_status_icon,
                 'not_listening_status_63x56.png')
             
-    
     def is_listening(self):
         # poll() returns None if not exited yet
         return self.radio_process is not None\
@@ -432,7 +407,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
         return os.path.join(root_folder, 'App_icons')
 
-    
     def setup_tabs(self, main_path: str):
         def func(tab: qtw.QWidget, tab_name: str):
             tab.setWindowIcon(qtg.QIcon('{}\\{}'.format(main_path, tab_name)))
@@ -450,8 +424,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     
     def application_icons(self):
         main_path = self.icons_path()
-        
-        
+
         tab = self.setup_tabs(main_path)
         tab(self.tb_player, 'player_icon_button_117x64.png')
         tab(self.tb_radio, 'radio_icon_button_70x64.png')
@@ -475,9 +448,15 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
 
 class Messages(MainClass):
 
-    def non_selected(self):
+    def no_song_selected(self):
         self.lb_mp_message.setText('select song to play')
         self.lb_mp_message.setStyleSheet(
+            'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+            )
+    
+    def no_radio_selected(self):
+        self.lb_radio_message.setText('select radio to play')
+        self.lb_radio_message.setStyleSheet(
             'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
             )
     
@@ -504,38 +483,17 @@ class Messages(MainClass):
         self.lb_radio_message.setStyleSheet(
             'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
         )
+    
+    def no_ffmpeg(self):
+        self.lb_radio_message.setText('You can\'t use radio. There is no FFmpeg installed on your computer')
+        self.lb_radio_message.setStyleSheet(
+            'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
+        )
 
-# class SetupColors(MainClass):
-    
-#     def buttons(self):
-#         self.pb_add_file.setStyleSheet(self.styles['buttons'])
-#         self.pb_add_folder.setStyleSheet(self.styles['buttons'])
-#         self.pb_remove_all.setStyleSheet(self.styles['buttons'])
-#         self.pb_start.setStyleSheet(self.styles['buttons'])
-#         self.pb_stop.setStyleSheet(self.styles['buttons'])
-#         self.pb_pause.setStyleSheet(self.styles['buttons'])
-#         self.pb_previous.setStyleSheet(self.styles['buttons'])
-#         self.pb_next.setStyleSheet(self.styles['buttons'])
-#         self.pb_start_radio.setStyleSheet(self.styles['buttons'])
-#         self.pb_stop_radio.setStyleSheet(self.styles['buttons'])
-
-#     def frames(self):
-#         self.fr_play_buttons.setStyleSheet(self.styles['frames'])
-#         self.fr_add_rem_buttons.setStyleSheet(self.styles['frames'])
-#         self.fr_empty.setStyleSheet(self.styles['frames'])
-#         self.fr_mp_message.setStyleSheet(self.styles['frames'])
-#         self.fr_radio_buttons.setStyleSheet(self.styles['frames'])
-#         self.fr_radio_message.setStyleSheet(self.styles['frames'])
-    
-#     def messags(self):
-#         self.fr_mp_message.setStyleSheet(self.styles['messages'])
-#         self.fr_radio_message.setStyleSheet(self.styles['messages'])
-    
-#     def background(self):
-#         self.tb_main.setStyleSheet(self.styles['background'])
 
 class CommandError(Exception):
     pass
+
 
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)

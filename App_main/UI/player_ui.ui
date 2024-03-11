@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>828</width>
-    <height>813</height>
+    <height>825</height>
    </rect>
   </property>
   <property name="font">
@@ -47,7 +47,7 @@
        <normaloff>../../App_icons/player_icon_button_117x64.png</normaloff>../../App_icons/player_icon_button_117x64.png</iconset>
      </attribute>
      <attribute name="title">
-      <string>Mp3 Player</string>
+      <string> Mp3 Player</string>
      </attribute>
      <widget class="QGroupBox" name="gb_now_play">
       <property name="geometry">
@@ -73,9 +73,6 @@
          <height>31</height>
         </rect>
        </property>
-       <property name="text">
-        <string>Artist-Song Title.mp3</string>
-       </property>
       </widget>
      </widget>
      <widget class="QFrame" name="fr_add_rem_buttons">
@@ -83,8 +80,8 @@
        <rect>
         <x>10</x>
         <y>80</y>
-        <width>161</width>
-        <height>251</height>
+        <width>171</width>
+        <height>281</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -97,13 +94,13 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
-         <width>141</width>
-         <height>71</height>
+         <y>100</y>
+         <width>151</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
-        <string>Add Folder</string>
+        <string> Add Folder</string>
        </property>
        <property name="iconSize">
         <size>
@@ -117,12 +114,12 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>141</width>
-         <height>71</height>
+         <width>151</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
-        <string>Add Song</string>
+        <string> Add Song</string>
        </property>
        <property name="iconSize">
         <size>
@@ -135,13 +132,13 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
-         <width>141</width>
-         <height>71</height>
+         <y>190</y>
+         <width>151</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
-        <string>Remove all</string>
+        <string> Remove all</string>
        </property>
        <property name="iconSize">
         <size>
@@ -155,7 +152,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>330</y>
+        <y>380</y>
         <width>161</width>
         <height>161</height>
        </rect>
@@ -203,9 +200,9 @@
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>80</y>
+        <y>360</y>
         <width>601</width>
-        <height>171</height>
+        <height>181</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -217,14 +214,14 @@
       <widget class="QPushButton" name="pb_start">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>60</x>
          <y>10</y>
-         <width>121</width>
-         <height>71</height>
+         <width>131</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
-        <string>Play</string>
+        <string>  Play</string>
        </property>
        <property name="iconSize">
         <size>
@@ -236,14 +233,14 @@
       <widget class="QPushButton" name="pb_pause">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>340</x>
          <y>10</y>
-         <width>221</width>
-         <height>71</height>
+         <width>231</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
-        <string>Pause/Unpause</string>
+        <string>  Pause/Unpause</string>
        </property>
        <property name="iconSize">
         <size>
@@ -257,12 +254,12 @@
         <rect>
          <x>200</x>
          <y>10</y>
-         <width>121</width>
-         <height>71</height>
+         <width>131</width>
+         <height>81</height>
         </rect>
        </property>
        <property name="text">
-        <string>Stop</string>
+        <string> Stop</string>
        </property>
        <property name="iconSize">
         <size>
@@ -274,14 +271,14 @@
       <widget class="QPushButton" name="pb_previous">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>90</y>
-         <width>111</width>
-         <height>61</height>
+         <x>150</x>
+         <y>100</y>
+         <width>121</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
-        <string>Prev</string>
+        <string>  Prev</string>
        </property>
        <property name="iconSize">
         <size>
@@ -294,13 +291,13 @@
        <property name="geometry">
         <rect>
          <x>280</x>
-         <y>90</y>
-         <width>121</width>
-         <height>61</height>
+         <y>100</y>
+         <width>131</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="text">
-        <string>Next</string>
+        <string>  Next</string>
        </property>
        <property name="iconSize">
         <size>
@@ -310,27 +307,11 @@
        </property>
       </widget>
      </widget>
-     <widget class="QFrame" name="fr_empty">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>510</y>
-        <width>161</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-     </widget>
      <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>260</y>
+        <y>80</y>
         <width>601</width>
         <height>271</height>
        </rect>
@@ -375,9 +356,6 @@
          <width>741</width>
          <height>31</height>
         </rect>
-       </property>
-       <property name="text">
-        <string>message</string>
        </property>
       </widget>
      </widget>
@@ -427,13 +405,13 @@
        <normaloff>../../App_icons/radio_icon_button_70x64.png</normaloff>../../App_icons/radio_icon_button_70x64.png</iconset>
      </attribute>
      <attribute name="title">
-      <string>Online radio</string>
+      <string> Online radio</string>
      </attribute>
      <widget class="QGroupBox" name="gb_now_listen">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>0</y>
         <width>761</width>
         <height>101</height>
        </rect>
@@ -453,9 +431,6 @@
          <height>61</height>
         </rect>
        </property>
-       <property name="text">
-        <string>Radiostation name</string>
-       </property>
       </widget>
       <widget class="QLabel" name="lb_radio_icon_big">
        <property name="geometry">
@@ -466,71 +441,13 @@
          <height>71</height>
         </rect>
        </property>
-       <property name="text">
-        <string>radio
- icon</string>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QFrame" name="fr_radio_buttons">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>120</y>
-        <width>491</width>
-        <height>101</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QPushButton" name="pb_start_radio">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>10</y>
-         <width>191</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Start listening</string>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>64</width>
-         <height>64</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pb_stop_radio">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
-         <y>10</y>
-         <width>181</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Stop listening</string>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>64</width>
-         <height>64</height>
-        </size>
-       </property>
       </widget>
      </widget>
      <widget class="QFrame" name="fr_radio_message">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>640</y>
+        <y>660</y>
         <width>771</width>
         <height>51</height>
        </rect>
@@ -570,398 +487,58 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QScrollArea" name="sa_radios_scroll">
+      <widget class="QFrame" name="fr_radio_buttons">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>10</y>
-         <width>761</width>
-         <height>251</height>
+         <x>10</x>
+         <y>160</y>
+         <width>491</width>
+         <height>101</height>
         </rect>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>105</verstretch>
-        </sizepolicy>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOn</enum>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
        </property>
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="sa_radios_scroll_content">
+       <widget class="QPushButton" name="pb_start_radio">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>742</width>
-          <height>792</height>
+          <x>40</x>
+          <y>10</y>
+          <width>201</width>
+          <height>81</height>
          </rect>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="pb_radiostation_1">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QPushButton" name="pb_radiostation_10">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPushButton" name="pb_radiostation_4">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="12" column="1">
-          <widget class="QPushButton" name="pb_radiostation_18">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QPushButton" name="pb_radiostation_15">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QPushButton" name="pb_radiostation_14">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QPushButton" name="pb_radiostation_13">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0">
-          <widget class="QPushButton" name="pb_radiostation_12">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QPushButton" name="pb_radiostation_16">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="pb_radiostation_2">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="pb_radiostation_5">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="pb_radiostation_3">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="1">
-          <widget class="QPushButton" name="pb_radiostation_19">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="1">
-          <widget class="QPushButton" name="pb_radiostation_11">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="0">
-          <widget class="QPushButton" name="pb_radiostation_20">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QPushButton" name="pb_radiostation_8">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="12" column="0">
-          <widget class="QPushButton" name="pb_radiostation_17">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QPushButton" name="pb_radiostation_9">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pb_radiostation_6">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QPushButton" name="pb_radiostation_7">
-           <property name="text">
-            <string>Radiostation
-Breakfast with Liam and Venetia</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../App_images/resources.qrc">
-             <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>64</width>
-             <height>64</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="text">
+         <string>  Start listening</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pb_stop_radio">
+        <property name="geometry">
+         <rect>
+          <x>250</x>
+          <y>10</y>
+          <width>191</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>  Stop listening</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>64</width>
+          <height>64</height>
+         </size>
+        </property>
        </widget>
       </widget>
      </widget>
@@ -969,7 +546,7 @@ Breakfast with Liam and Venetia</string>
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>110</y>
+        <y>380</y>
         <width>251</width>
         <height>111</height>
        </rect>
@@ -983,14 +560,14 @@ Breakfast with Liam and Venetia</string>
       <widget class="QLabel" name="lb_le_radio_status">
        <property name="geometry">
         <rect>
-         <x>120</x>
+         <x>100</x>
          <y>30</y>
          <width>121</width>
          <height>71</height>
         </rect>
        </property>
        <property name="text">
-        <string>radio status</string>
+        <string>not running</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -1017,9 +594,9 @@ Breakfast with Liam and Venetia</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>510</y>
+        <y>540</y>
         <width>771</width>
-        <height>121</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="title">
@@ -1032,7 +609,7 @@ Breakfast with Liam and Venetia</string>
        <property name="geometry">
         <rect>
          <x>250</x>
-         <y>31</y>
+         <y>20</y>
          <width>91</width>
          <height>81</height>
         </rect>
@@ -1047,9 +624,403 @@ Breakfast with Liam and Venetia</string>
          <x>360</x>
          <y>30</y>
          <width>171</width>
-         <height>81</height>
+         <height>71</height>
         </rect>
        </property>
+      </widget>
+     </widget>
+     <widget class="QScrollArea" name="sa_radios_scroll">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>761</width>
+        <height>251</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>105</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="sa_radios_scroll_content">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>742</width>
+         <height>792</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pb_radiostation_1">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QPushButton" name="pb_radiostation_10">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pb_radiostation_4">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="QPushButton" name="pb_radiostation_18">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QPushButton" name="pb_radiostation_15">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QPushButton" name="pb_radiostation_14">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QPushButton" name="pb_radiostation_13">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QPushButton" name="pb_radiostation_12">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QPushButton" name="pb_radiostation_16">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="pb_radiostation_2">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="pb_radiostation_5">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="pb_radiostation_3">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="1">
+         <widget class="QPushButton" name="pb_radiostation_19">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QPushButton" name="pb_radiostation_11">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="13" column="0">
+         <widget class="QPushButton" name="pb_radiostation_20">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QPushButton" name="pb_radiostation_8">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="0">
+         <widget class="QPushButton" name="pb_radiostation_17">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QPushButton" name="pb_radiostation_9">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pb_radiostation_6">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QPushButton" name="pb_radiostation_7">
+          <property name="text">
+           <string>Radiostation
+Breakfast with Liam and Venetia</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../App_images/resources.qrc">
+            <normaloff>:/radio_icons/test_64x64.png</normaloff>:/radio_icons/test_64x64.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

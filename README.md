@@ -10,8 +10,25 @@ tinytag-1.10.1 [https://github.com/devsnd/tinytag]
 pygame 2.5.2 [https://www.pygame.org/news]
 miniaudio 1.59 [https://github.com/irmen/pyminiaudio]
 python-ffmpeg 2.0.10 [https://github.com/jonghwanhyeon/python-ffmpeg]
-for AAC streaming download and install FFMPEG [https://ffmpeg.org/download.html],
-next add to the PATH on windows eg: `C:\ffmpeg\bin`, restart computer and done
+
+### Installing  FFmpeg
+FFmpeg is required for this program to work correctly.
+Install FFmpeg by following these steps:
+- download and install FFMPEG [https://ffmpeg.org/download.html],
+- add to the PATH on windows eg: `C:\ffmpeg\bin`, 
+- restart computer and done
+
+### Adding to the path (Windows 10)
+- right-click on the Start Button
+- select “System” from the context menu.
+- click “Advanced system settings”
+- go to the “Advanced” tab
+- click “Environment Variables…”
+- click variable called “Path” and click “Edit…”
+- click “New”
+- paste eg: `C:\ffmpeg\bin`
+
+
 
 to set audio volume in miniaudio
 
