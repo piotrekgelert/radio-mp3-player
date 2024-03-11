@@ -26,11 +26,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     is_paused: bool = False
     playing_num: str = ''
     radio_process = None
-    threadd: Thread = None
-    dev: subprocess = None
+    threadd: Thread|None = None
+    dev: miniaudio.PlaybackDevice|None = None
     radio_vol: float = 0.0
-    internet_connection: bool = None
-    styles = {
+    internet_connection: bool|None = None
+    styles: dict = {
         'buttons': 'color: rgb(255, 255, 255);background-color: rgb(170, 170, 255);font: 12pt "Comic Sans MS";',
         'frames': 'background-color: rgb(56, 56, 56);',
         'messages': 'color: rgb(255, 255, 255); background-color: rgb(56, 56, 56);',
@@ -65,19 +65,19 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         self.dl_radio_volume.valueChanged.connect(self.radio_volume_set)
         
-    def add_songs(self):
+    def add_songs(self) -> None:
         self.lb_mp_message.clear()
         try:
-            s_path = qtw.QFileDialog.getExistingDirectory()
-            ls_songs = os.listdir(s_path)
-            self.songs_len = len(ls_songs)
+            s_path: str = qtw.QFileDialog.getExistingDirectory()
+            ls_songs: list = os.listdir(s_path)
+            self.songs_len: int = len(ls_songs)
             for file in ls_songs:
-                fpath = os.path.join(s_path, file)
+                fpath: str = os.path.join(s_path, file)
                 self.set_song(fpath)
         except:
             Messages.not_added(self)
 
-    def add_song(self):
+    def add_song(self) -> None:
         self.lb_mp_message.clear()
         try:
             s_path = qtw.QFileDialog.getOpenFileName()
@@ -227,10 +227,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
 
     def root_path(self, destination_folder: str) -> str:
         root_path = r''.format(pathlib.Path(__file__).parent.absolute().parent)
-        return os.path.join(root_path, destination_folder)
+        res: str = os.path.join(root_path, destination_folder)
+        return res
 
     def set_radio_button(self):
-        main_path = self.root_path('App_images')
+        main_path:str = self.root_path('App_images')
         def func(button: qtw.QPushButton, img_name: str, radio_name: str, radio_info: str):
             button.setIcon(qtg.QIcon(f'{main_path}\\{img_name}'))
             button.setText(f'{radio_name}\n{radio_info}')
@@ -258,7 +259,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     
     def button_clicked(self, nb: int):
         main_path = self.root_path('App_images')
-        info: json = self.get_button_data('irish_top_20_buttons.json')
+        info: dict = self.get_button_data('irish_top_20_buttons.json')
         butt: str = self.sa_radios_scroll_content.children()[nb].objectName()
         _, _, num = butt.split('_')
         self.playing_num = num
@@ -347,7 +348,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             Messages.no_ffmpeg(self)
             
     def listening(self):
-        info: json = self.get_button_data('radio_web_format.json')
+        info: dict = self.get_button_data('radio_web_format.json')
         filename: str = info[f'butt_{self.playing_num}']['web']
         channels: int = 2
         sample_rate: int = 44100
@@ -403,9 +404,10 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         except requests.ConnectionError:
             self.internet_connection = False
     
-    def icons_path(self):
-        root_folder = r''.format(pathlib.Path(__file__).parent.absolute().parent)
-        return os.path.join(root_folder, 'App_icons')
+    def icons_path(self) -> str:
+        root_folder = r'{}'.format(pathlib.Path(__file__).parent.absolute().parent)
+        res:str = os.path.join(root_folder, 'App_icons')
+        return res
 
     def setup_tabs(self, main_path: str):
         def func(tab: qtw.QWidget, tab_name: str):
