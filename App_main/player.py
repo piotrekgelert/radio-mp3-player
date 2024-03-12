@@ -13,12 +13,15 @@ import pygame
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
 import requests
+from player_icons_setup import ApplicationIconSetup
 from tinytag import TinyTag as tag
 from UI.player_ui_ui import Ui_mw_main
 
 log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=log.DEBUG)
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
+    
+    app_icons = ApplicationIconSetup
     songs: dict = {}
     songs_len: int = 0
     songs_duration: int = 0
@@ -145,7 +148,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         pygame.mixer.music.set_volume(0.0)
     
     def play(self):
-        lab_img = self.setup_pixels(self.icons_path())
+        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         if len(self.songs) > 0:
             if self.lw_songs.currentRow() >= 0:
                 pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
@@ -164,7 +167,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             Messages.no_song(self)
     
     def stop(self):
-        lab_img = self.setup_pixels(self.icons_path())
+        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         pygame.mixer.music.stop()
         self.lb_le_status.setText('Stopped')
         
@@ -175,7 +178,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             )
         
     def pause(self):
-        lab_img = self.setup_pixels(self.icons_path())
+        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         if self.is_playing and not self.is_paused:
             pygame.mixer.music.pause()
             self.lb_le_status.setText('Paused')
@@ -231,7 +234,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         return res
 
     def set_radio_button(self):
-        main_path:str = self.root_path('App_images')
+        main_path:str = self.app_icons.root_path(self, 'App_images')
         def func(button: qtw.QPushButton, img_name: str, radio_name: str, radio_info: str):
             button.setIcon(qtg.QIcon(f'{main_path}\\{img_name}'))
             button.setText(f'{radio_name}\n{radio_info}')
@@ -251,14 +254,14 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             )
 
     def get_button_data(self, j_file):
-        main_path = self.root_path('App_main')
+        main_path = self.app_icons.root_path(self, 'App_main')
         f_path = os.path.join(main_path, j_file)
         with open(f_path, 'r') as f:
             btn = json.load(f)
             return btn
     
     def button_clicked(self, nb: int):
-        main_path = self.root_path('App_images')
+        main_path = self.app_icons.root_path(self, 'App_images')
         info: dict = self.get_button_data('irish_top_20_buttons.json')
         butt: str = self.sa_radios_scroll_content.children()[nb].objectName()
         _, _, num = butt.split('_')
@@ -336,7 +339,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                         self.threadd.start()
                         self.pb_start_radio.setEnabled(False)
                         self.lb_le_radio_status.setText('running')
-                        lab_img = self.setup_pixels(self.icons_path())
+                        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
                         lab_img(
                             self.lb_le_radio_status_icon,
                             'listening_status_63x56.png')
@@ -370,7 +373,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.stream.close()
             self.lb_le_radio_status.setText('stopped')
             self.pb_start_radio.setEnabled(True)
-            lab_img = self.setup_pixels(self.icons_path())
+            lab_img = self.app_icons.setup_pixels(self, 'App_icons')
             lab_img(
                 self.lb_le_radio_status_icon,
                 'not_listening_status_63x56.png')
@@ -404,34 +407,14 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         except requests.ConnectionError:
             self.internet_connection = False
     
-    def icons_path(self) -> str:
-        root_folder = r'{}'.format(pathlib.Path(__file__).parent.absolute().parent)
-        res:str = os.path.join(root_folder, 'App_icons')
-        return res
-
-    def setup_tabs(self, main_path: str):
-        def func(tab: qtw.QWidget, tab_name: str):
-            tab.setWindowIcon(qtg.QIcon('{}\\{}'.format(main_path, tab_name)))
-        return func
-    
-    def setup_icons(self, main_path: str):
-        def func(butt:qtw.QPushButton, icon_name:str):
-            butt.setIcon(qtg.QIcon('{}\\{}'.format(main_path, icon_name)))
-        return func
-    
-    def setup_pixels(self, main_path: str):
-        def func(lb:qtw.QLabel, icon_name: str):
-            lb.setPixmap(qtg.QPixmap('{}\\{}'.format(main_path, icon_name)))
-        return func
-    
     def application_icons(self):
-        main_path = self.icons_path()
+        main_path = self.app_icons.root_path(self, 'App_icons')
 
-        tab = self.setup_tabs(main_path)
+        tab = self.app_icons.setup_tabs(self, main_path)
         tab(self.tb_player, 'player_icon_button_117x64.png')
         tab(self.tb_radio, 'radio_icon_button_70x64.png')
 
-        button = self.setup_icons(main_path)
+        button = self.app_icons.setup_icons(self, main_path)
         button(self.pb_add_file, 'import_file_button_56x64.png')
         button(self.pb_add_folder, 'import_folder_button_49x64.png')
         button(self.pb_remove_all, 'remove_all_button_50x64.png')
@@ -443,7 +426,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         button(self.pb_start_radio, 'play_button_64x64.png')
         button(self.pb_stop_radio, 'stop_button_64x64.png')
 
-        lab_img = self.setup_pixels(main_path)
+        lab_img = self.app_icons.setup_pixels(self, main_path)
         lab_img(self.lb_le_radio_status_icon, 'not_listening_status_63x56.png')
         lab_img(self.lb_le_status_icon, 'stop_mp3_status_75x64.png')
     
