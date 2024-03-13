@@ -3,7 +3,6 @@ import json
 import logging as log
 import os
 import pathlib
-import subprocess
 import sys
 from threading import Thread
 
@@ -12,16 +11,20 @@ import psutil
 import pygame
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
-import requests
+from audio_processing import FFmpegProcess, PygameProcess
 from player_icons_setup import ApplicationIconSetup
 from tinytag import TinyTag as tag
 from UI.player_ui_ui import Ui_mw_main
+from utilities import NetworkAvaibility, SongDuration
 
 log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=log.DEBUG)
 
 class MainClass(qtw.QMainWindow, Ui_mw_main):
     
     app_icons = ApplicationIconSetup
+    app_audio = PygameProcess
+    app_radio_audio = FFmpegProcess
+    time_song = SongDuration
     songs: dict = {}
     songs_len: int = 0
     songs_duration: int = 0
@@ -46,9 +49,9 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         qtw.QDialog.setFixedSize(self, 830,  825)
         self.application_icons()
         self.radio_buttons()
-        self.pygame_init()
+        self.app_audio.pygame_init(self)
         self.initial_radio_volume_set()
-        self.net_check()
+        NetworkAvaibility.net_check(self)
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
         self.pb_remove_all.clicked.connect(self.clear_song_list)
@@ -89,21 +92,21 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         except:
             Messages.not_added(self)
     
-    def song_time(self, inf):
-        hours = int(inf // 3600)
-        hour_other = inf % 3600
+    # def song_time(self, inf):
+    #     hours = int(inf // 3600)
+    #     hour_other = inf % 3600
 
-        mins = int(hour_other // 60)
-        mins_other = hour_other % 60
+    #     mins = int(hour_other // 60)
+    #     mins_other = hour_other % 60
 
-        seconds = int(mins_other % 60)
+    #     seconds = int(mins_other % 60)
 
-        time_took = '{}:{}:{}'.format(
-            hours if hours > 10 else '0' + str(hours),
-            mins if mins > 10 else '0' + str(mins),
-            seconds if seconds > 10 else '0' + str(seconds)
-            )
-        return time_took
+    #     time_took = '{}:{}:{}'.format(
+    #         hours if hours > 10 else '0' + str(hours),
+    #         mins if mins > 10 else '0' + str(mins),
+    #         seconds if seconds > 10 else '0' + str(seconds)
+    #         )
+    #     return time_took
     
     def set_song(self, file_link:str):
         self.song_dict(file_link)
@@ -117,11 +120,12 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 info.artist,
                 info.title,
                 info.album,
-                self.song_time(info.duration)
+                self.time_song.song_time(self, info.duration)
             )
         else:
             song = '{}:     {}'.format(
-                file_link.split('\\')[-1], self.song_time(info.duration))
+                file_link.split('\\')[-1],
+                self.time_song.song_time(self, info.duration))
         
         label = qtw.QListWidgetItem(song)
         self.lw_songs.addItem(label)
@@ -142,17 +146,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lb_le_now_play.clear()
         self.lw_songs.clear()
     
-    def pygame_init(self):
-        pygame.init()
-        pygame.mixer.init()
-        pygame.mixer.music.set_volume(0.0)
-    
     def play(self):
         lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         if len(self.songs) > 0:
             if self.lw_songs.currentRow() >= 0:
-                pygame.mixer.music.load(self.songs[self.lw_songs.currentRow()])
-                pygame.mixer.music.play()
+                self.app_audio.music_start(self, self.songs[self.lw_songs.currentRow()])
                 self.lb_mp_message.clear()
                 
                 if not self.is_playing:
@@ -168,7 +166,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     
     def stop(self):
         lab_img = self.app_icons.setup_pixels(self, 'App_icons')
-        pygame.mixer.music.stop()
+        self.app_audio.music_stop(self)
         self.lb_le_status.setText('Stopped')
         
         if self.is_playing:
@@ -180,7 +178,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     def pause(self):
         lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         if self.is_playing and not self.is_paused:
-            pygame.mixer.music.pause()
+            self.app_audio.music_pause(self)
             self.lb_le_status.setText('Paused')
             lab_img(
                 self.lb_le_status_icon, 'pause_mp3_status_75x64.png'
@@ -189,7 +187,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.is_playing = False
             self.is_paused = True
         elif self.is_paused and not self.is_playing:
-            pygame.mixer.music.unpause()
+            self.app_audio.music_unpause(self)
             self.lb_le_status.setText('Playing')
             lab_img(
                 self.lb_le_status_icon, 'play_mp3_status_75x64.png'
@@ -226,12 +224,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             10: (10, 3)
         }
         self.lcd_song_volume.display(vol[volume][0])
-        pygame.mixer.music.set_volume(vol[volume][1])   
-
-    def root_path(self, destination_folder: str) -> str:
-        root_path = r''.format(pathlib.Path(__file__).parent.absolute().parent)
-        res: str = os.path.join(root_path, destination_folder)
-        return res
+        pygame.mixer.music.set_volume(vol[volume][1])
 
     def set_radio_button(self):
         main_path:str = self.app_icons.root_path(self, 'App_images')
@@ -281,33 +274,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         buttons_clicked = self.connect_buttons()
         for x, y in zip(range(1, 21), nums):
             buttons_clicked(getattr(self, 'pb_radiostation_{}'.format(x)), y)
-
-    def stream_signal(self, source):
-        channels = 2
-        sample_width = 2  # 16 bit pcm
-        required_frames = yield b""  # generator initialization
-        while True:
-            required_bytes = required_frames * channels * sample_width
-            sample_data = source.read(required_bytes)
-            if not sample_data:
-                break
-            # print(".", end="", flush=True)
-            required_frames = yield sample_data
-    
-    def audio_device(self):
-        return miniaudio.PlaybackDevice(
-            output_format=miniaudio.SampleFormat.SIGNED16,
-            nchannels=2, 
-            sample_rate=44100)
-    
-    def process_device(self, filename, channels, sample_rate):
-        return subprocess.Popen(
-            ["ffmpeg", "-v", "fatal", "-hide_banner", "-nostdin",
-            "-i", filename, "-f",
-            "s16le", "-acodec", "pcm_s16le",
-            "-ac", str(channels), "-ar", str(sample_rate), "-"],
-            stdin=None, stdout=subprocess.PIPE
-        )
     
     def activate_process(self):
         if not self.radio_process:
@@ -355,13 +321,12 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         filename: str = info[f'butt_{self.playing_num}']['web']
         channels: int = 2
         sample_rate: int = 44100
-        self.dev = self.audio_device()
-        self.radio_process = self.process_device(
-                filename, channels, sample_rate
-                )
+        self.dev = self.app_radio_audio.audio_device(self)
+        self.radio_process = self.app_radio_audio.process_device(self,
+            filename, channels, sample_rate
+        )
         self.activate_process()
-        
-        self.stream = self.stream_signal(self.radio_process.stdout)
+        self.stream = self.app_radio_audio.stream_signal(self, self.radio_process.stdout)
         next(self.stream)  # start the stream, stream.send()
     
         self.dev._device.masterVolumeFactor = self.radio_vol
@@ -399,14 +364,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lcd_radio_vol.display(radio_vol_dict[r_vol][0])
         self.radio_vol: float = radio_vol_dict[r_vol][1]
     
-    def net_check(self):
-        try:
-            response = requests.get('https://www.google.com')
-            if response.status_code == 200:
-                self.internet_connection = True
-        except requests.ConnectionError:
-            self.internet_connection = False
-    
     def application_icons(self):
         main_path = self.app_icons.root_path(self, 'App_icons')
 
@@ -429,7 +386,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         lab_img = self.app_icons.setup_pixels(self, main_path)
         lab_img(self.lb_le_radio_status_icon, 'not_listening_status_63x56.png')
         lab_img(self.lb_le_status_icon, 'stop_mp3_status_75x64.png')
-    
 
 class Messages(MainClass):
 
@@ -475,9 +431,6 @@ class Messages(MainClass):
             'QLabel {color: rgb(255, 0, 0); font: 12pt "Comic Sans MS"}'
         )
 
-
-class CommandError(Exception):
-    pass
 
 
 if __name__ == '__main__':
