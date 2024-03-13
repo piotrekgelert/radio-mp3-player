@@ -1,14 +1,11 @@
-import gc
 import json
 import logging as log
 import os
-import pathlib
 import sys
 from threading import Thread
 
 import miniaudio
 import psutil
-import pygame
 import PyQt6.QtGui as qtg
 import PyQt6.QtWidgets as qtw
 from audio_processing import FFmpegProcess, PygameProcess
@@ -19,8 +16,8 @@ from utilities import NetworkAvaibility, SongDuration
 
 log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=log.DEBUG)
 
+
 class MainClass(qtw.QMainWindow, Ui_mw_main):
-    
     app_icons = ApplicationIconSetup
     app_audio = PygameProcess
     app_radio_audio = FFmpegProcess
@@ -91,22 +88,6 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.set_song(file)
         except:
             Messages.not_added(self)
-    
-    # def song_time(self, inf):
-    #     hours = int(inf // 3600)
-    #     hour_other = inf % 3600
-
-    #     mins = int(hour_other // 60)
-    #     mins_other = hour_other % 60
-
-    #     seconds = int(mins_other % 60)
-
-    #     time_took = '{}:{}:{}'.format(
-    #         hours if hours > 10 else '0' + str(hours),
-    #         mins if mins > 10 else '0' + str(mins),
-    #         seconds if seconds > 10 else '0' + str(seconds)
-    #         )
-    #     return time_took
     
     def set_song(self, file_link:str):
         self.song_dict(file_link)
@@ -224,7 +205,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             10: (10, 3)
         }
         self.lcd_song_volume.display(vol[volume][0])
-        pygame.mixer.music.set_volume(vol[volume][1])
+        self.app_audio.set_volume(self, vol[volume][1])
 
     def set_radio_button(self):
         main_path:str = self.app_icons.root_path(self, 'App_images')
@@ -386,6 +367,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         lab_img = self.app_icons.setup_pixels(self, main_path)
         lab_img(self.lb_le_radio_status_icon, 'not_listening_status_63x56.png')
         lab_img(self.lb_le_status_icon, 'stop_mp3_status_75x64.png')
+
 
 class Messages(MainClass):
 

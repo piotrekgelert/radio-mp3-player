@@ -54,3 +54,6 @@ class PygameProcess:
     
     def music_unpause(self):
         pygame.mixer.music.unpause()
+    
+    def set_volume(self, vol):
+        pygame.mixer.music.set_volume(vol)
