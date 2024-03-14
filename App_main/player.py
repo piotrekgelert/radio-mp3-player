@@ -263,16 +263,13 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         
         try:
             proc = psutil.Process(self.radio_process.pid)
-            # proc_name = psutil.Process(self.radio_process.args)
             if proc.status() == psutil.STATUS_ZOMBIE:
 
                 log.info('process is zombie')
                 return False
             if proc.status() in [psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING]:
-                # print('process activated')
                 log.info('process activated')
                 return True
-            # return False
         except (psutil.NoSuchProcess, Exception) as e:
             log.error('process not found while checking: {}'.format(e))
             return False

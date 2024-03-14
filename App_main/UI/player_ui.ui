@@ -33,7 +33,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -466,9 +466,6 @@
          <width>741</width>
          <height>31</height>
         </rect>
-       </property>
-       <property name="text">
-        <string>message</string>
        </property>
       </widget>
      </widget>

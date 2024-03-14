@@ -302,7 +302,7 @@ class Ui_mw_main(object):
         mw_main.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(mw_main)
-        self.tb_main.setCurrentIndex(0)
+        self.tb_main.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(mw_main)
 
     def retranslateUi(self, mw_main):
@@ -323,7 +323,6 @@ class Ui_mw_main(object):
         self.groupBox.setTitle(_translate("mw_main", "Volume"))
         self.tb_main.setTabText(self.tb_main.indexOf(self.tb_player), _translate("mw_main", " Mp3 Player"))
         self.gb_now_listen.setTitle(_translate("mw_main", "Now listening:"))
-        self.lb_radio_message.setText(_translate("mw_main", "message"))
         self.pb_start_radio.setText(_translate("mw_main", "  Start listening"))
         self.pb_stop_radio.setText(_translate("mw_main", "  Stop listening"))
         self.radio_status.setTitle(_translate("mw_main", "Status"))
