@@ -8,8 +8,8 @@ with program and allow program to execute other tasks in parallel
 ### ui example:
 
 <p align="middle">
-  <img src="D:\Python_PORTFOLIO312\16_mp3_player_radio\images\mp3_player.png" width="30%"/>
-  <img src="D:\Python_PORTFOLIO312\16_mp3_player_radio\images\online_radio.png" width="30%"/>
+  <img src="https://github.com/piotrekgelert/radio-mp3-player/blob/main/images/mp3_player.png" width="45%"/>
+  <img src="https://github.com/piotrekgelert/radio-mp3-player/blob/main/images/online_radio.png" width="45%"/>
 </p>
 
 ### notes
@@ -39,9 +39,7 @@ if you want to change volume in radio:
 - [python-ffmpeg 2.0.10](https://github.com/jonghwanhyeon/python-ffmpeg)
 
 ### running the project
-App opens from `player.py` file
-or
-Use exe file.
+App opens from `player.py` file or use exe file.
 
 ### installing  FFmpeg
 FFmpeg is required for this program to work correctly.

@@ -13,6 +13,7 @@ class NetworkAvaibility:
 
 
 class SongDuration:
+    
     def song_time(self, inf):
         hours = int(inf // 3600)
         hour_other = inf % 3600

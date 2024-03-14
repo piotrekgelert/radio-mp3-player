@@ -302,7 +302,7 @@ class Ui_mw_main(object):
         mw_main.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(mw_main)
-        self.tb_main.setCurrentIndex(1)
+        self.tb_main.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(mw_main)
 
     def retranslateUi(self, mw_main):
