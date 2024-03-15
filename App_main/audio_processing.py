@@ -48,6 +48,9 @@ class PygameProcess:
 
     def music_stop(self):
         pygame.mixer.music.stop()
+    
+    def music_is_running(self):
+        return pygame.mixer.music.get_busy()
 
     def music_pause(self):
         pygame.mixer.music.pause()
@@ -57,3 +60,6 @@ class PygameProcess:
     
     def set_volume(self, vol):
         pygame.mixer.music.set_volume(vol)
+    
+    def get_time(self):
+        return pygame.mixer.music.get_pos()

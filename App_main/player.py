@@ -21,6 +21,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     app_icons = ApplicationIconSetup
     app_audio = PygameProcess
     app_radio_audio = FFmpegProcess
+    nbs = 0
     time_song = SongDuration
     songs: dict = {}
     songs_len: int = 0
@@ -49,6 +50,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.app_audio.pygame_init(self)
         self.initial_radio_volume_set()
         NetworkAvaibility.net_check(self)
+        self.music_stopped()
         self.pb_add_file.clicked.connect(self.add_song)
         self.pb_add_folder.clicked.connect(self.add_songs)
         self.pb_remove_all.clicked.connect(self.clear_song_list)
@@ -140,6 +142,12 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                     lab_img(
                         self.lb_le_status_icon, 'play_mp3_status_75x64.png'
                         )
+                    if self.threadd is None or not self.threadd.is_alive():
+                        self.threadd = Thread(target=self.music_stopped)
+                        self.threadd.start()
+                    # while self.app_audio.music_is_running(self):
+                    #     print(self.nbs)
+                    #     self.nbs +=1
             else:
                 Messages.no_song_selected(self)
         else:
@@ -156,6 +164,19 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
             self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
             )
         
+    def music_stopped(self):
+        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
+        if self.app_audio.music_is_running(self) and self.is_playing:
+            while self.app_audio.music_is_running(self):
+                print(self.app_audio.get_time(self), )
+                # pass
+            else:
+                lab_img(
+                    self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
+                    )
+                self.lb_le_status.setText('Finished')
+                self.is_playing = False
+
     def pause(self):
         lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         if self.is_playing and not self.is_paused:
