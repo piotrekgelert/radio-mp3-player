@@ -13,11 +13,13 @@ with program and allow program to execute other tasks in parallel
 </p>
 
 ### notes
+FFmpeg is required for this program to work correctly.
 - mp3 player
     - songs can be added by one or from folder
     - informations about songs are taken from tags, if not available from title of the file
+    - songs are played with help of multithreading, thanks to what are light for the system
 - online radio
-    - radio is played in threads to not interfere with program thanks to what is not heavy for the system
+    - radio is played with help of multithreading
     - choice of 20 the most popular radiostations in Ireland
 
 
@@ -36,13 +38,12 @@ if you want to change volume in radio:
 - [tinytag-1.10.1](https://github.com/devsnd/tinytag)
 - [pygame 2.5.2](https://www.pygame.org/news)
 - [miniaudio 1.59](https://github.com/irmen/pyminiaudio)
-- [python-ffmpeg 2.0.10](https://github.com/jonghwanhyeon/python-ffmpeg)
+- [FFmpeg](https://ffmpeg.org/)
 
 ### running the project
 App opens from `player.py` file or use exe file.
 
 ### installing  FFmpeg
-FFmpeg is required for this program to work correctly.
 Install FFmpeg by following these steps:
 - download and install FFMPEG [https://ffmpeg.org/download.html],
 - add to the PATH on windows eg: `C:\ffmpeg\bin`, 
@@ -60,3 +61,6 @@ Install FFmpeg by following these steps:
 
 ## licence
 This project is licensed under the [MIT] License - see [Licence.md](LICENSE) file for details.
+
+## problems
+- [x] add one song, is wrongly listed

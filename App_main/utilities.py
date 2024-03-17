@@ -1,3 +1,5 @@
+from threading import Thread
+
 import requests
 
 
@@ -29,3 +31,11 @@ class SongDuration:
             seconds if seconds > 10 else '0' + str(seconds)
             )
         return time_took
+
+
+class ThreadingStart:
+    
+    def start_thread(self, func):
+        if self.threadd is None or not self.threadd.is_alive():
+                        self.threadd = Thread(target=func)
+                        self.threadd.start()

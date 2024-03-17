@@ -2,6 +2,7 @@ import json
 import logging as log
 import os
 import sys
+import time
 from threading import Thread
 
 import miniaudio
@@ -12,7 +13,7 @@ from audio_processing import FFmpegProcess, PygameProcess
 from player_icons_setup import ApplicationIconSetup
 from tinytag import TinyTag as tag
 from UI.player_ui_ui import Ui_mw_main
-from utilities import NetworkAvaibility, SongDuration
+from utilities import NetworkAvaibility, SongDuration, ThreadingStart
 
 log.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=log.DEBUG)
 
@@ -21,6 +22,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
     app_icons = ApplicationIconSetup
     app_audio = PygameProcess
     app_radio_audio = FFmpegProcess
+    thread_start = ThreadingStart
     nbs = 0
     time_song = SongDuration
     songs: dict = {}
@@ -86,8 +88,8 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         self.lb_mp_message.clear()
         try:
             s_path = qtw.QFileDialog.getOpenFileName()
-            file:str = s_path[0]
-            self.set_song(file)
+            fpath: str = s_path[0]
+            self.set_song(fpath)
         except:
             Messages.not_added(self)
     
@@ -106,10 +108,16 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 self.time_song.song_time(self, info.duration)
             )
         else:
-            song = '{}:     {}'.format(
-                file_link.split('\\')[-1],
-                self.time_song.song_time(self, info.duration))
-        
+            link = file_link.split('/')[-1]
+            if '\\' in link:
+                song = '{}:     {}'.format(
+                    link.split('\\')[-1],
+                    self.time_song.song_time(self, info.duration))
+            else:
+                song = '{}:     {}'.format(
+                    link,
+                    self.time_song.song_time(self, info.duration))
+            
         label = qtw.QListWidgetItem(song)
         self.lw_songs.addItem(label)
         
@@ -142,12 +150,7 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                     lab_img(
                         self.lb_le_status_icon, 'play_mp3_status_75x64.png'
                         )
-                    if self.threadd is None or not self.threadd.is_alive():
-                        self.threadd = Thread(target=self.music_stopped)
-                        self.threadd.start()
-                    # while self.app_audio.music_is_running(self):
-                    #     print(self.nbs)
-                    #     self.nbs +=1
+                    self.thread_start.start_thread(self, self.music_stopped)
             else:
                 Messages.no_song_selected(self)
         else:
@@ -163,28 +166,11 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         lab_img(
             self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
             )
-        
-    def music_stopped(self):
-        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
-        if self.app_audio.music_is_running(self) and self.is_playing:
-            while self.app_audio.music_is_running(self):
-                print(self.app_audio.get_time(self), )
-                # pass
-            else:
-                lab_img(
-                    self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
-                    )
-                self.lb_le_status.setText('Finished')
-                self.is_playing = False
 
     def pause(self):
         lab_img = self.app_icons.setup_pixels(self, 'App_icons')
         if self.is_playing and not self.is_paused:
             self.app_audio.music_pause(self)
-            self.lb_le_status.setText('Paused')
-            lab_img(
-                self.lb_le_status_icon, 'pause_mp3_status_75x64.png'
-                )
             
             self.is_playing = False
             self.is_paused = True
@@ -196,7 +182,29 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
                 )
             self.is_playing = True
             self.is_paused = False
-    
+
+            self.thread_start.start_thread(self, self.music_stopped)
+
+    def music_stopped(self):
+        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
+        if self.app_audio.music_is_running(self) and self.is_playing:
+            while self.is_playing:
+                time.sleep(1)
+                if self.app_audio.music_is_running(self):
+                    pass
+                else:
+                    if not self.is_paused:
+                        lab_img(
+                            self.lb_le_status_icon, 'stop_mp3_status_75x64.png'
+                            )
+                        self.lb_le_status.setText('Stopped')
+                        self.is_playing = False
+                    if self.is_paused:
+                        self.lb_le_status.setText('Paused')
+                        lab_img(
+                            self.lb_le_status_icon, 'pause_mp3_status_75x64.png'
+                            )
+
     def prev_song(self):
         self.lb_mp_message.clear()
         current = self.lw_songs.currentRow()
@@ -299,15 +307,13 @@ class MainClass(qtw.QMainWindow, Ui_mw_main):
         try:
             if self.internet_connection:
                 if len(self.lb_le_now_listen.text()):
-                    if self.threadd is None or not self.threadd.is_alive():
-                        self.threadd = Thread(target=self.listening)
-                        self.threadd.start()
-                        self.pb_start_radio.setEnabled(False)
-                        self.lb_le_radio_status.setText('running')
-                        lab_img = self.app_icons.setup_pixels(self, 'App_icons')
-                        lab_img(
-                            self.lb_le_radio_status_icon,
-                            'listening_status_63x56.png')
+                    self.thread_start.start_thread(self, self.listening)
+                    self.pb_start_radio.setEnabled(False)
+                    self.lb_le_radio_status.setText('running')
+                    lab_img = self.app_icons.setup_pixels(self, 'App_icons')
+                    lab_img(
+                        self.lb_le_radio_status_icon,
+                        'listening_status_63x56.png')
                 else:
                     Messages.no_radio_selected(self)      
             else:
